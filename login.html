@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Login | Yankiii Barber Co.</title>
+    <meta name="description" content="Sign in to your Yankiii Barber Co. account to view upcoming haircuts, review appointment history, or reschedule your chair.">
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- ================= NAVBAR ================= -->
+    <header class="header">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                YANKIII
+                <span>BARBER CO.</span>
+            </a>
+
+            <nav class="navbar" id="navbar">
+                <a href="index.html">Home</a>
+                <a href="services.html">Services</a>
+                <a href="barbers.html">Barbers</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="booking.html" class="nav-book">Book Now</a>
+            </nav>
+
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle Navigation Menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="auth-page">
+        <div class="auth-card">
+            <div class="auth-header">
+                <span class="eyebrow">WELCOME BACK</span>
+                <h1>Sign In</h1>
+                <p>Access your appointments and grooming profile.</p>
+            </div>
+
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label class="form-label" for="loginEmail">Email Address</label>
+                    <input type="email" id="loginEmail" class="form-control" placeholder="name@example.com" required autocomplete="email">
+                </div>
+
+                <div class="form-group">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <label class="form-label" for="loginPassword" style="margin-bottom: 0;">Password</label>
+                    </div>
+                    <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+                </div>
+                <div class="forgot-password-link">
+                    <a href="forgot-password">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block" id="loginBtn">
+                    Sign In <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                Don't have an account yet? <a href="register.html">Create one now</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- ================= FOOTER ================= -->
+    <footer class="footer">
+        <div class="container footer-bottom" style="border-top:none;">
+            <p>© 2026 Yankiii Barber Co. All rights reserved.</p>
+            <p>Designed & Developed by Khian</p>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+
+</body>
+
+</html>
+

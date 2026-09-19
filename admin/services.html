@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Services | Yankiii Barber Co. Admin</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body class="admin-body">
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="admin-sidebar" id="adminSidebar">
+        <div class="admin-sidebar-brand">
+            <a href="dashboard.html" class="logo">
+                YANKIII <span>ADMIN</span>
+            </a>
+            <button class="modal-close" style="color:#b5c0b0; display:none;" id="sidebarCloseBtn" onclick="toggleSidebar()">&times;</button>
+        </div>
+
+        <nav class="admin-nav">
+            <a href="dashboard.html"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+            <a href="bookings.html"><i class="fa-regular fa-calendar-check"></i> Bookings</a>
+            <a href="services.html" class="active"><i class="fa-solid fa-scissors"></i> Services</a>
+            <a href="barbers.html"><i class="fa-solid fa-user-tie"></i> Barbers</a>
+            <a href="customers.html"><i class="fa-solid fa-users"></i> Customers</a>
+            <a href="settings.html"><i class="fa-solid fa-clock"></i> Business Hours</a>
+        </nav>
+
+        <div class="admin-nav-footer">
+            <a href="../index.html" target="_blank" style="display: flex; align-items: center; gap: 8px; color: #b5c0b0; font-size: 13px; margin-bottom: 12px;">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> View Live Website
+            </a>
+            <button type="button" onclick="logoutAdmin()" class="btn btn-sm btn-outline btn-block" style="border-color:#465143;color:#e6f4e6;">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- ================= MAIN ================= -->
+    <div class="admin-main">
+        <header class="admin-topbar">
+            <div class="admin-topbar-left">
+                <button type="button" class="admin-toggle-btn" onclick="toggleSidebar()">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <h2 style="font-size: 18px; font-weight: 700;">Services Menu Management</h2>
+            </div>
+            <div class="admin-topbar-right">
+                <button type="button" class="btn btn-primary btn-sm" onclick="openAddServiceModal()">
+                    <i class="fa-solid fa-plus"></i> Add New Service
+                </button>
+            </div>
+        </header>
+
+        <main class="admin-content-body">
+            <div class="data-panel">
+                <div class="data-panel-header">
+                    <h3>Grooming & Haircut Services</h3>
+                    <div style="font-size: 13px; color: #65705f;">
+                        Changes here immediately affect customer booking options and chair duration calculation.
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Service Name</th>
+                                <th>Price</th>
+                                <th>Duration</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="servicesTableBody">
+                            <tr>
+                                <td colspan="7" style="text-align: center; padding: 30px; color: #65705f;">
+                                    <i class="fa-solid fa-spinner fa-spin"></i> Loading services...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add / Edit Service Modal -->
+    <div class="modal-backdrop" id="serviceModal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 id="serviceModalTitle">Add Service</h3>
+                <button type="button" class="modal-close" onclick="closeServiceModal()">&times;</button>
+            </div>
+            <form id="serviceForm" onsubmit="handleSaveService(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="serviceFormId">
+
+                    <div class="form-group">
+                        <label class="form-label" for="serviceName">Service Name *</label>
+                        <input type="text" id="serviceName" class="form-control" placeholder="e.g. Signature Fade" required>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div class="form-group">
+                            <label class="form-label" for="servicePrice">Price (₱) *</label>
+                            <input type="number" id="servicePrice" class="form-control" placeholder="350" min="0" step="10" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="serviceDuration">Duration (Minutes) *</label>
+                            <select id="serviceDuration" class="form-select" required>
+                                <option value="15">15 mins</option>
+                                <option value="30">30 mins</option>
+                                <option value="45">45 mins</option>
+                                <option value="60">60 mins</option>
+                                <option value="75">75 mins</option>
+                                <option value="90">90 mins</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="serviceDesc">Description</label>
+                        <textarea id="serviceDesc" class="form-control" placeholder="Detailed service description..." rows="3"></textarea>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div class="form-group">
+                            <label class="form-label" for="serviceImage">Local Image Path</label>
+                            <input type="text" id="serviceImage" class="form-control" placeholder="assets/images/service-1.jpg">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="serviceStatus">Status *</label>
+                            <select id="serviceStatus" class="form-select" required>
+                                <option value="active">Active (Bookable)</option>
+                                <option value="inactive">Inactive (Disabled)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="closeServiceModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm" id="saveServiceBtn">Save Service</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/admin.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            initServicesPage();
+        });
+    </script>
+</body>
+
+</html>
+

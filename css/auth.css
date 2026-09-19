@@ -1,0 +1,251 @@
+/**
+ * Yankiii Barber Co. — Auth & Dashboard Styles
+ * Handles login/register forms, customer appointment cards, and history tables.
+ */
+
+.auth-page {
+    min-height: calc(100vh - 82px);
+    display: grid;
+    place-items: center;
+    padding: 60px 20px;
+    background: #f8faf8;
+}
+
+.auth-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 40px;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 15px 35px rgba(45, 58, 42, 0.06);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.auth-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    color: var(--dark);
+    margin-bottom: 6px;
+}
+
+.auth-header p {
+    font-size: 14px;
+    color: #65705f;
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 13px;
+    color: #65705f;
+}
+
+.auth-footer a {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
+}
+
+/* ================= CUSTOMER DASHBOARD ================= */
+.dashboard-page {
+    padding: 50px 0 90px;
+    background: #fafdfa;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 35px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.dashboard-welcome h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    color: var(--dark);
+}
+
+.dashboard-welcome p {
+    font-size: 14px;
+    color: #65705f;
+}
+
+.dashboard-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+.dashboard-sidebar {
+    background: var(--white);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    padding: 24px;
+}
+
+.user-profile-badge {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.user-avatar-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: var(--white);
+    display: grid;
+    place-items: center;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.dashboard-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.dash-nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    color: var(--dark);
+    font-weight: 600;
+    font-size: 14px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+    transition: 0.2s;
+    width: 100%;
+}
+
+.dash-nav-btn:hover {
+    background: var(--light);
+    color: var(--primary);
+}
+
+.dash-nav-btn.active {
+    background: var(--primary);
+    color: var(--white);
+}
+
+.dash-nav-btn.logout {
+    color: #dc2626;
+    margin-top: 15px;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+}
+
+.dash-nav-btn.logout:hover {
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+/* Appointment Cards */
+.appointment-card {
+    background: var(--white);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    padding: 24px 28px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 16px rgba(45, 58, 42, 0.03);
+    transition: 0.25s ease;
+}
+
+.appointment-card:hover {
+    border-color: var(--secondary);
+    box-shadow: 0 8px 24px rgba(45, 58, 42, 0.06);
+}
+
+.appointment-main-info h3 {
+    font-size: 18px;
+    margin-bottom: 6px;
+    color: var(--dark);
+}
+
+.appointment-meta-row {
+    display: flex;
+    gap: 20px;
+    font-size: 13px;
+    color: #65705f;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.appointment-meta-row span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.appointment-right-action {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: var(--white);
+    border-radius: var(--radius-md);
+    border: 1px dashed var(--border);
+}
+
+.empty-state i {
+    font-size: 42px;
+    color: #a3b39e;
+    margin-bottom: 14px;
+}
+
+.empty-state h3 {
+    font-size: 18px;
+    margin-bottom: 6px;
+}
+
+.empty-state p {
+    font-size: 14px;
+    color: #65705f;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 900px) {
+    .dashboard-layout {
+        grid-template-columns: 1fr;
+    }
+    .appointment-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+    .appointment-right-action {
+        align-items: flex-start;
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}
+

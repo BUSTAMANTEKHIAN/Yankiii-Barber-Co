@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book an Appointment | Yankiii Barber Co.</title>
+    <meta name="description" content="Book your next haircut or fade online with Yankiii Barber Co. Select your preferred barber, choose a time slot, and enjoy zero wait time.">
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/booking.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- ================= NAVBAR ================= -->
+    <header class="header">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                YANKIII
+                <span>BARBER CO.</span>
+            </a>
+
+            <nav class="navbar" id="navbar">
+                <a href="index.html">Home</a>
+                <a href="services.html">Services</a>
+                <a href="barbers.html">Barbers</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="booking.html" class="nav-book active">Book Now</a>
+            </nav>
+
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle Navigation Menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="booking-section">
+        <div class="container">
+
+            <!-- Stepper Progress Bar -->
+            <div class="booking-steps-bar">
+                <div class="step-progress-fill" id="stepProgressFill"></div>
+
+                <div class="step-node active" data-step="1" onclick="jumpToStep(1)">
+                    <div class="step-circle"><i class="fa-solid fa-scissors"></i></div>
+                    <span class="step-title">1. Service</span>
+                </div>
+
+                <div class="step-node" data-step="2" onclick="jumpToStep(2)">
+                    <div class="step-circle"><i class="fa-solid fa-user-tie"></i></div>
+                    <span class="step-title">2. Barber</span>
+                </div>
+
+                <div class="step-node" data-step="3" onclick="jumpToStep(3)">
+                    <div class="step-circle"><i class="fa-regular fa-calendar-days"></i></div>
+                    <span class="step-title">3. Date & Time</span>
+                </div>
+
+                <div class="step-node" data-step="4" onclick="jumpToStep(4)">
+                    <div class="step-circle"><i class="fa-solid fa-check"></i></div>
+                    <span class="step-title">4. Confirm</span>
+                </div>
+            </div>
+
+            <!-- Booking Layout: Wizard Panels (Left) + Real-time Summary (Right) -->
+            <div class="booking-layout">
+
+                <!-- Step Panels Container -->
+                <div class="step-panels-container">
+
+                    <!-- STEP 1: SERVICE SELECTION -->
+                    <div class="step-panel active" id="stepPanel1">
+                        <div class="step-card">
+                            <div class="step-card-header">
+                                <h2>Select Your Service</h2>
+                                <p>Choose the grooming package or precision cut you'd like today.</p>
+                            </div>
+
+                            <div class="selectable-services" id="serviceOptionsList">
+                                <!-- Populated dynamically by booking.js or fallback -->
+                                <div class="service-select-item" data-id="1" data-name="Classic Haircut" data-price="250" data-duration="30">
+                                    <div class="service-item-info">
+                                        <h4>Classic Haircut</h4>
+                                        <p>Clean scissor and clipper finish tailored to your personal style.</p>
+                                    </div>
+                                    <div class="service-item-meta">
+                                        <span class="price">₱250</span>
+                                        <span class="duration"><i class="fa-regular fa-clock"></i> 30 min</span>
+                                    </div>
+                                </div>
+
+                                <div class="service-select-item" data-id="2" data-name="Signature Fade" data-price="350" data-duration="45">
+                                    <div class="service-item-info">
+                                        <h4>Signature Fade</h4>
+                                        <p>Skin, taper, low/mid/high fade with seamless foil razor gradient.</p>
+                                    </div>
+                                    <div class="service-item-meta">
+                                        <span class="price">₱350</span>
+                                        <span class="duration"><i class="fa-regular fa-clock"></i> 45 min</span>
+                                    </div>
+                                </div>
+
+                                <div class="service-select-item" data-id="3" data-name="Hair & Beard" data-price="450" data-duration="60">
+                                    <div class="service-item-info">
+                                        <h4>Hair & Beard Combo</h4>
+                                        <p>Complete grooming session with haircut, beard sculpt, and hot towel.</p>
+                                    </div>
+                                    <div class="service-item-meta">
+                                        <span class="price">₱450</span>
+                                        <span class="duration"><i class="fa-regular fa-clock"></i> 60 min</span>
+                                    </div>
+                                </div>
+
+                                <div class="service-select-item" data-id="4" data-name="Full Grooming VIP" data-price="550" data-duration="75">
+                                    <div class="service-item-info">
+                                        <h4>Full Grooming VIP</h4>
+                                        <p>Executive fade, facial cleanse, hot lather shave, scalp massage & tonic.</p>
+                                    </div>
+                                    <div class="service-item-meta">
+                                        <span class="price">₱550</span>
+                                        <span class="duration"><i class="fa-regular fa-clock"></i> 75 min</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="wizard-nav-btns">
+                                <div></div>
+                                <button type="button" class="btn btn-primary" onclick="goToStep(2)" id="step1NextBtn" disabled>
+                                    Continue to Barber <i class="fa-solid fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: BARBER SELECTION -->
+                    <div class="step-panel" id="stepPanel2">
+                        <div class="step-card">
+                            <div class="step-card-header">
+                                <h2>Select Your Barber</h2>
+                                <p>Choose your preferred specialist or pick any available chair.</p>
+                            </div>
+
+                            <div class="selectable-barbers" id="barberOptionsList">
+                                <div class="barber-select-item" data-id="1" data-name="Mark Santos" data-specialty="Senior Barber">
+                                    <div class="barber-avatar-sm">
+                                        <img src="assets/images/barber-1.jpg" alt="Mark Santos">
+                                    </div>
+                                    <div class="barber-select-text">
+                                        <h4>Mark Santos</h4>
+                                        <span>Senior Barber</span>
+                                    </div>
+                                </div>
+
+                                <div class="barber-select-item" data-id="2" data-name="James Cruz" data-specialty="Fade Specialist">
+                                    <div class="barber-avatar-sm">
+                                        <img src="assets/images/barber-2.jpg" alt="James Cruz">
+                                    </div>
+                                    <div class="barber-select-text">
+                                        <h4>James Cruz</h4>
+                                        <span>Fade Specialist</span>
+                                    </div>
+                                </div>
+
+                                <div class="barber-select-item" data-id="3" data-name="Alex Garcia" data-specialty="Grooming Specialist">
+                                    <div class="barber-avatar-sm">
+                                        <img src="assets/images/barber-3.jpg" alt="Alex Garcia">
+                                    </div>
+                                    <div class="barber-select-text">
+                                        <h4>Alex Garcia</h4>
+                                        <span>Grooming Specialist</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="wizard-nav-btns">
+                                <button type="button" class="btn btn-outline" onclick="goToStep(1)">
+                                    <i class="fa-solid fa-arrow-left"></i> Back to Service
+                                </button>
+                                <button type="button" class="btn btn-primary" onclick="goToStep(3)" id="step2NextBtn" disabled>
+                                    Continue to Date & Time <i class="fa-solid fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: DATE & TIME SELECTION -->
+                    <div class="step-panel" id="stepPanel3">
+                        <div class="step-card">
+                            <div class="step-card-header">
+                                <h2>Select Date & Time</h2>
+                                <p>Real-time slot availability based on barber schedule and existing bookings.</p>
+                            </div>
+
+                            <!-- Date Selection -->
+                            <div class="date-selector-wrap">
+                                <label class="form-label" for="bookingDateInput">Appointment Date</label>
+                                <div class="date-chips" id="quickDateChips">
+                                    <!-- Populated dynamically: Today, Tomorrow, etc. -->
+                                </div>
+                                <input type="date" id="bookingDateInput" class="form-control" style="max-width: 280px;">
+                            </div>
+
+                            <!-- Time Slots Container -->
+                            <div class="time-slots-container">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <label class="form-label" style="margin-bottom: 0;">Available Time Slots</label>
+                                    <span id="slotDurationNote" style="font-size: 12px; color: var(--primary); font-weight: 600;"></span>
+                                </div>
+
+                                <div id="slotsLoadingMsg" style="display: none; padding: 25px; text-align: center; color: #65705f;">
+                                    <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 24px; color: var(--primary); margin-bottom: 8px;"></i>
+                                    <div>Checking barber availability & booking overlaps...</div>
+                                </div>
+
+                                <div class="slots-grid" id="slotsGrid">
+                                    <!-- Injected dynamically -->
+                                </div>
+
+                                <div class="slot-status-indicator">
+                                    <div><span class="status-dot" style="background: var(--white); border: 2px solid var(--border);"></span> Available</div>
+                                    <div><span class="status-dot" style="background: var(--primary);"></span> Selected</div>
+                                    <div><span class="status-dot" style="background: #e5e7eb;"></span> Booked / Passed</div>
+                                </div>
+                            </div>
+
+                            <div class="wizard-nav-btns">
+                                <button type="button" class="btn btn-outline" onclick="goToStep(2)">
+                                    <i class="fa-solid fa-arrow-left"></i> Back to Barber
+                                </button>
+                                <button type="button" class="btn btn-primary" onclick="goToStep(4)" id="step3NextBtn" disabled>
+                                    Review Details <i class="fa-solid fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 4: CUSTOMER DETAILS & REVIEW -->
+                    <div class="step-panel" id="stepPanel4">
+                        <div class="step-card">
+                            <div class="step-card-header">
+                                <h2>Customer Information & Confirmation</h2>
+                                <p>Please review and provide contact details for appointment updates.</p>
+                            </div>
+
+                            <form id="bookingForm" onsubmit="handleBookingSubmit(event)">
+                                <div class="form-group">
+                                    <label class="form-label" for="custName">Full Name *</label>
+                                    <input type="text" id="custName" class="form-control" placeholder="e.g. Marco Reyes" required>
+                                </div>
+
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                    <div class="form-group">
+                                        <label class="form-label" for="custEmail">Email Address *</label>
+                                        <input type="email" id="custEmail" class="form-control" placeholder="name@example.com" required>
+                                        <span class="form-helper">Confirmation & booking ID will be sent here.</span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label" for="custPhone">Phone Number *</label>
+                                        <input type="tel" id="custPhone" class="form-control" placeholder="0912 345 6789" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="custNotes">Special Requests or Hair Notes (Optional)</label>
+                                    <textarea id="custNotes" class="form-control" placeholder="e.g. Skin fade with textured top; sensitive scalp; etc." rows="3"></textarea>
+                                </div>
+
+                                <div class="wizard-nav-btns">
+                                    <button type="button" class="btn btn-outline" onclick="goToStep(3)">
+                                        <i class="fa-solid fa-arrow-left"></i> Back to Time
+                                    </button>
+                                    <button type="submit" class="btn btn-primary" id="confirmBookingBtn">
+                                        Confirm Booking <i class="fa-solid fa-check"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Sticky Booking Summary Sidebar -->
+                <aside class="booking-summary-card">
+                    <div class="summary-header">
+                        <h3>Booking Summary</h3>
+                    </div>
+
+                    <div class="summary-row">
+                        <span class="label">Service</span>
+                        <span class="value" id="summaryService">Not selected</span>
+                    </div>
+
+                    <div class="summary-row">
+                        <span class="label">Duration</span>
+                        <span class="value" id="summaryDuration">—</span>
+                    </div>
+
+                    <div class="summary-row">
+                        <span class="label">Barber</span>
+                        <span class="value" id="summaryBarber">Not selected</span>
+                    </div>
+
+                    <div class="summary-row">
+                        <span class="label">Date</span>
+                        <span class="value" id="summaryDate">—</span>
+                    </div>
+
+                    <div class="summary-row">
+                        <span class="label">Time</span>
+                        <span class="value" id="summaryTime">—</span>
+                    </div>
+
+                    <div class="summary-divider"></div>
+
+                    <div class="summary-total">
+                        <span>Total Price</span>
+                        <span class="amount" id="summaryPrice">₱0</span>
+                    </div>
+
+                    <div class="payment-note">
+                        <i class="fa-solid fa-store" style="color: var(--primary); font-size: 18px;"></i>
+                        <div>
+                            <strong>Pay at Shop</strong>
+                            <div style="font-size: 11px; color: #5d6859;">Cash or e-wallet upon chair finish</div>
+                        </div>
+                    </div>
+
+                    <div style="font-size: 12px; color: #65705f; line-height: 1.5;">
+                        <i class="fa-solid fa-circle-check" style="color: var(--primary); margin-right: 4px;"></i>
+                        Free cancellation up to 1 hour before scheduled cut.
+                    </div>
+                </aside>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ================= FOOTER ================= -->
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div class="footer-brand">
+                <a href="index.html" class="logo">
+                    YANKIII
+                    <span>BARBER CO.</span>
+                </a>
+                <p>Precision cuts. Personal style. Your standard.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#"><i class="fa-brands fa-tiktok"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-column">
+                <h4>Navigation</h4>
+                <a href="index.html">Home</a>
+                <a href="services.html">Services</a>
+                <a href="barbers.html">Barbers</a>
+                <a href="about.html">About</a>
+            </div>
+
+            <div class="footer-column">
+                <h4>Services</h4>
+                <a href="services.html">Classic Haircut</a>
+                <a href="services.html">Signature Fade</a>
+                <a href="services.html">Hair & Beard</a>
+                <a href="services.html">Full Grooming VIP</a>
+            </div>
+
+            <div class="footer-column">
+                <h4>Visit Us</h4>
+                <p>Your Location<br>Biñan, Laguna</p>
+                <p>Mon – Sun<br>9:00 AM – 8:00 PM</p>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div class="container">
+                <p>© 2026 Yankiii Barber Co. All rights reserved.</p>
+                <p>Designed & Developed by Khian</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/booking.js"></script>
+</body>
+
+</html>
+

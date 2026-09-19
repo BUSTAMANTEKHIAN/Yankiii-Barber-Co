@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services & Pricing | Yankiii Barber Co.</title>
+    <meta name="description" content="Explore our complete menu of premium haircuts, signature fades, beard trims, and full grooming packages at Yankiii Barber Co.">
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- ================= NAVBAR ================= -->
+    <header class="header">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                YANKIII
+                <span>BARBER CO.</span>
+            </a>
+
+            <nav class="navbar" id="navbar">
+                <a href="index.html">Home</a>
+                <a href="services.html" class="active">Services</a>
+                <a href="barbers.html">Barbers</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="booking.html" class="nav-book">Book Now</a>
+            </nav>
+
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle Navigation Menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <!-- ================= PAGE BANNER ================= -->
+        <section class="page-header">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i>
+                    <span>Services</span>
+                </div>
+                <h1>Crafted Grooming <span>Menu.</span></h1>
+                <p>Transparent pricing, dedicated chair times, and precision barbering tailored to your personal aesthetic.</p>
+            </div>
+        </section>
+
+        <!-- ================= SERVICES CATALOG ================= -->
+        <section class="section">
+            <div class="container">
+                <div class="section-heading">
+                    <div>
+                        <span class="eyebrow">OUR SPECIALTIES</span>
+                        <h2>Select Your <span>Treatment</span></h2>
+                    </div>
+                    <p style="color: #65705f; max-width: 460px;">
+                        All services include hot towel finish, straight razor neck clean-up, and premium styling product application.
+                    </p>
+                </div>
+
+                <!-- Dynamic / Fallback Services Grid -->
+                <div class="service-grid" id="servicesContainer">
+                    <!-- Service 1 -->
+                    <article class="service-card">
+                        <div class="service-image">
+                            <img src="assets/images/service-1.jpg" alt="Classic Haircut">
+                        </div>
+                        <div class="service-content">
+                            <div class="service-top">
+                                <h3>Classic Haircut</h3>
+                                <span>₱250</span>
+                            </div>
+                            <p>A clean and timeless haircut tailored to your preferred style. Includes consultation, rinse, and precision scissor/clipper finish.</p>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                                <span class="duration"><i class="fa-regular fa-clock"></i> 30 min</span>
+                                <a href="booking.html?service_id=1" class="btn btn-sm btn-outline">Book Service</a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Service 2 -->
+                    <article class="service-card">
+                        <div class="service-image">
+                            <img src="assets/images/service-2.jpg" alt="Signature Fade">
+                        </div>
+                        <div class="service-content">
+                            <div class="service-top">
+                                <h3>Signature Fade</h3>
+                                <span>₱350</span>
+                            </div>
+                            <p>Skin taper, low, mid, or high fade with seamless transition, foil shaver close finish, and razor edge sharpness.</p>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                                <span class="duration"><i class="fa-regular fa-clock"></i> 45 min</span>
+                                <a href="booking.html?service_id=2" class="btn btn-sm btn-outline">Book Service</a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Service 3 -->
+                    <article class="service-card">
+                        <div class="service-image">
+                            <img src="assets/images/service-3.jpg" alt="Hair and Beard Combo">
+                        </div>
+                        <div class="service-content">
+                            <div class="service-top">
+                                <h3>Hair & Beard</h3>
+                                <span>₱450</span>
+                            </div>
+                            <p>Complete grooming session including full haircut of choice, beard sculpting, line-up, organic beard oil, and hot towel.</p>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                                <span class="duration"><i class="fa-regular fa-clock"></i> 60 min</span>
+                                <a href="booking.html?service_id=3" class="btn btn-sm btn-outline">Book Service</a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Service 4 -->
+                    <article class="service-card">
+                        <div class="service-image">
+                            <img src="assets/images/service-4.jpg" alt="Full Grooming Experience">
+                        </div>
+                        <div class="service-content">
+                            <div class="service-top">
+                                <h3>Full Grooming VIP</h3>
+                                <span>₱550</span>
+                            </div>
+                            <p>The total executive package: Signature Fade, beard grooming, exfoliating facial cleanse, hot lather shave, scalp massage, and tonic styling.</p>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                                <span class="duration"><i class="fa-regular fa-clock"></i> 75 min</span>
+                                <a href="booking.html?service_id=4" class="btn btn-sm btn-outline">Book Service</a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= EXPERIENCE GUARANTEE ================= -->
+        <section class="section" style="background: var(--light);">
+            <div class="container">
+                <div class="section-heading centered">
+                    <span class="eyebrow">WHAT TO EXPECT</span>
+                    <h2>Our Service <span>Commitment.</span></h2>
+                    <p>Every service at Yankiii Barber Co. follows strict sanitary and styling protocols.</p>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature-card" style="background: var(--white);">
+                        <div class="feature-icon"><i class="fa-solid fa-pump-medical"></i></div>
+                        <h3>Sterilized Tools</h3>
+                        <p>Hospital-grade UV and Barbicide sterilization for all blades, clippers, guards, and shears between every appointment.</p>
+                    </div>
+                    <div class="feature-card" style="background: var(--white);">
+                        <div class="feature-icon"><i class="fa-solid fa-comments"></i></div>
+                        <h3>Tailored Consultation</h3>
+                        <p>We review your desired look, lifestyle, and facial structure before making the first cut.</p>
+                    </div>
+                    <div class="feature-card" style="background: var(--white);">
+                        <div class="feature-icon"><i class="fa-solid fa-mug-hot"></i></div>
+                        <h3>Hot Towel Comfort</h3>
+                        <p>Infused hot towel therapy to relax pores, soften whiskers, and provide clean soothing relief.</p>
+                    </div>
+                    <div class="feature-card" style="background: var(--white);">
+                        <div class="feature-icon"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+                        <h3>Pay at the Shop</h3>
+                        <p>No upfront deposit needed. Enjoy your service first and pay cash or preferred method at the counter.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= CTA ================= -->
+        <section class="booking-cta">
+            <div class="container cta-container">
+                <div>
+                    <span class="eyebrow">CHOOSE YOUR MASTER BARBER</span>
+                    <h2>Ready for a sharp, <span>confident cut?</span></h2>
+                </div>
+                <a href="booking.html" class="btn btn-light">
+                    Schedule Your Appointment
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- ================= FOOTER ================= -->
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div class="footer-brand">
+                <a href="index.html" class="logo">
+                    YANKIII
+                    <span>BARBER CO.</span>
+                </a>
+                <p>Precision cuts. Personal style. Your standard.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#"><i class="fa-brands fa-tiktok"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-column">
+                <h4>Navigation</h4>
+                <a href="index.html">Home</a>
+                <a href="services.html">Services</a>
+                <a href="barbers.html">Barbers</a>
+                <a href="about.html">About</a>
+            </div>
+
+            <div class="footer-column">
+                <h4>Services</h4>
+                <a href="services.html">Classic Haircut</a>
+                <a href="services.html">Signature Fade</a>
+                <a href="services.html">Hair & Beard</a>
+                <a href="services.html">Full Grooming VIP</a>
+            </div>
+
+            <div class="footer-column">
+                <h4>Visit Us</h4>
+                <p>Your Location<br>Biñan, Laguna</p>
+                <p>Mon – Sun<br>9:00 AM – 8:00 PM</p>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div class="container">
+                <p>© 2026 Yankiii Barber Co. All rights reserved.</p>
+                <p>Designed & Developed by Khian</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/services.js"></script>
+</body>
+
+</html>
+

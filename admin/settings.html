@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Hours & Settings | Yankiii Barber Co. Admin</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body class="admin-body">
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="admin-sidebar" id="adminSidebar">
+        <div class="admin-sidebar-brand">
+            <a href="dashboard.html" class="logo">
+                YANKIII <span>ADMIN</span>
+            </a>
+            <button class="modal-close" style="color:#b5c0b0; display:none;" id="sidebarCloseBtn" onclick="toggleSidebar()">&times;</button>
+        </div>
+
+        <nav class="admin-nav">
+            <a href="dashboard.html"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+            <a href="bookings.html"><i class="fa-regular fa-calendar-check"></i> Bookings</a>
+            <a href="services.html"><i class="fa-solid fa-scissors"></i> Services</a>
+            <a href="barbers.html"><i class="fa-solid fa-user-tie"></i> Barbers</a>
+            <a href="customers.html"><i class="fa-solid fa-users"></i> Customers</a>
+            <a href="settings.html" class="active"><i class="fa-solid fa-clock"></i> Business Hours</a>
+        </nav>
+
+        <div class="admin-nav-footer">
+            <a href="../index.html" target="_blank" style="display: flex; align-items: center; gap: 8px; color: #b5c0b0; font-size: 13px; margin-bottom: 12px;">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> View Live Website
+            </a>
+            <button type="button" onclick="logoutAdmin()" class="btn btn-sm btn-outline btn-block" style="border-color:#465143;color:#e6f4e6;">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- ================= MAIN ================= -->
+    <div class="admin-main">
+        <header class="admin-topbar">
+            <div class="admin-topbar-left">
+                <button type="button" class="admin-toggle-btn" onclick="toggleSidebar()">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <h2 style="font-size: 18px; font-weight: 700;">Shop Operating Hours</h2>
+            </div>
+        </header>
+
+        <main class="admin-content-body">
+            <div class="data-panel" style="max-width: 800px;">
+                <div class="data-panel-header">
+                    <div>
+                        <h3>Weekly Shop Hours</h3>
+                        <p style="font-size: 13px; color: #65705f; margin-top: 4px;">
+                            Configure shop opening and closing times. The booking engine automatically restricts customer appointments to these hours.
+                        </p>
+                    </div>
+                </div>
+
+                <div style="padding: 24px;">
+                    <form id="businessHoursForm" onsubmit="handleSaveBusinessHours(event)">
+                        <div id="businessHoursContainer">
+                            <!-- Populated with Mon..Sun rows -->
+                        </div>
+
+                        <div style="margin-top: 24px; display: flex; justify-content: flex-end;">
+                            <button type="submit" class="btn btn-primary" id="saveHoursBtn">
+                                Save Operating Hours <i class="fa-solid fa-check"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/admin.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            initSettingsPage();
+        });
+    </script>
+</body>
+
+</html>
+

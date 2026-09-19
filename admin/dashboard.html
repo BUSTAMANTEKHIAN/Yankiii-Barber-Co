@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Yankiii Barber Co.</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body class="admin-body">
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="admin-sidebar" id="adminSidebar">
+        <div class="admin-sidebar-brand">
+            <a href="dashboard.html" class="logo">
+                YANKIII <span>ADMIN</span>
+            </a>
+            <button class="modal-close" style="color:#b5c0b0; display:none;" id="sidebarCloseBtn" onclick="toggleSidebar()">&times;</button>
+        </div>
+
+        <nav class="admin-nav">
+            <a href="dashboard.html" class="active"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+            <a href="bookings.html"><i class="fa-regular fa-calendar-check"></i> Bookings</a>
+            <a href="services.html"><i class="fa-solid fa-scissors"></i> Services</a>
+            <a href="barbers.html"><i class="fa-solid fa-user-tie"></i> Barbers</a>
+            <a href="customers.html"><i class="fa-solid fa-users"></i> Customers</a>
+            <a href="settings.html"><i class="fa-solid fa-clock"></i> Business Hours</a>
+        </nav>
+
+        <div class="admin-nav-footer">
+            <a href="../index.html" target="_blank" style="display: flex; align-items: center; gap: 8px; color: #b5c0b0; font-size: 13px; margin-bottom: 12px;">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> View Live Website
+            </a>
+            <button type="button" onclick="logoutAdmin()" class="btn btn-sm btn-outline btn-block" style="border-color:#465143;color:#e6f4e6;">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- ================= MAIN ================= -->
+    <div class="admin-main">
+        <header class="admin-topbar">
+            <div class="admin-topbar-left">
+                <button type="button" class="admin-toggle-btn" onclick="toggleSidebar()">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <h2 style="font-size: 18px; font-weight: 700;">Executive Dashboard</h2>
+            </div>
+
+            <div class="admin-topbar-right">
+                <div style="text-align: right;">
+                    <div style="font-size: 14px; font-weight: 700;" id="adminUserDisplayName">Admin Manager</div>
+                    <div style="font-size: 11px; color: #65705f;">Shop Owner / Administrator</div>
+                </div>
+            </div>
+        </header>
+
+        <main class="admin-content-body">
+            <!-- Metric KPI Cards -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-info">
+                        <h4>Total Bookings</h4>
+                        <div class="metric-num" id="kpiTotalBookings">—</div>
+                    </div>
+                    <div class="metric-icon"><i class="fa-solid fa-book-bookmark"></i></div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-info">
+                        <h4>Today's Appointments</h4>
+                        <div class="metric-num" id="kpiTodayBookings">—</div>
+                    </div>
+                    <div class="metric-icon"><i class="fa-regular fa-calendar-day"></i></div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-info">
+                        <h4>Pending Confirmation</h4>
+                        <div class="metric-num" style="color: #d97706;" id="kpiPendingBookings">—</div>
+                    </div>
+                    <div class="metric-icon" style="color:#d97706; background:#fef3c7;"><i class="fa-solid fa-hourglass-half"></i></div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-info">
+                        <h4>Completed Cuts</h4>
+                        <div class="metric-num" style="color: #0284c7;" id="kpiCompletedBookings">—</div>
+                    </div>
+                    <div class="metric-icon" style="color:#0284c7; background:#e0f2fe;"><i class="fa-solid fa-circle-check"></i></div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-info">
+                        <h4>Registered Customers</h4>
+                        <div class="metric-num" id="kpiTotalCustomers">—</div>
+                    </div>
+                    <div class="metric-icon"><i class="fa-solid fa-user-group"></i></div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-info">
+                        <h4>Total Revenue</h4>
+                        <div class="metric-num" style="color: var(--primary);" id="kpiTotalRevenue">—</div>
+                    </div>
+                    <div class="metric-icon"><i class="fa-solid fa-coins"></i></div>
+                </div>
+            </div>
+
+            <!-- Recent Bookings Table -->
+            <div class="data-panel">
+                <div class="data-panel-header">
+                    <h3>Recent Appointments</h3>
+                    <a href="bookings.html" class="btn btn-sm btn-outline">View All Bookings <i class="fa-solid fa-arrow-right"></i></a>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Reference</th>
+                                <th>Customer</th>
+                                <th>Service</th>
+                                <th>Barber</th>
+                                <th>Date & Time</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentBookingsTableBody">
+                            <tr>
+                                <td colspan="8" style="text-align: center; padding: 30px; color: #65705f;">
+                                    <i class="fa-solid fa-spinner fa-spin"></i> Loading appointments...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/admin.js"></script>
+</body>
+
+</html>
+

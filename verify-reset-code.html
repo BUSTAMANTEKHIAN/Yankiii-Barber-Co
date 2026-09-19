@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Verify Code | Yankiii Barber Co.</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .verify-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 20px;
+            background: #f7f5f2;
+        }
+
+        .verify-card {
+            width: 100%;
+            max-width: 460px;
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 40px;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.08);
+        }
+
+        .verify-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .verify-logo h1 {
+            margin: 0;
+            font-size: 28px;
+            letter-spacing: 1px;
+        }
+
+        .verify-logo p {
+            margin-top: 8px;
+            color: #777;
+            font-size: 14px;
+        }
+
+        .verify-header {
+            margin-bottom: 25px;
+        }
+
+        .verify-header h2 {
+            margin: 0 0 8px;
+            font-size: 25px;
+        }
+
+        .verify-header p {
+            margin: 0;
+            color: #777;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .email-display {
+            margin-top: 10px;
+            font-weight: 600;
+            color: #111;
+            word-break: break-word;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 20px;
+            letter-spacing: 7px;
+            text-align: center;
+            outline: none;
+            box-sizing: border-box;
+            transition: 0.2s ease;
+        }
+
+        .form-group input:focus {
+            border-color: #111;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .verify-btn {
+            width: 100%;
+            border: none;
+            border-radius: 10px;
+            padding: 14px;
+            background: #111;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .verify-btn:hover {
+            background: #333;
+        }
+
+        .verify-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .message {
+            display: none;
+            margin-bottom: 20px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .message.success {
+            display: block;
+            background: #eaf7ee;
+            color: #176b35;
+        }
+
+        .message.error {
+            display: block;
+            background: #fff0f0;
+            color: #a52828;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .back-link a {
+            color: #111;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 500px) {
+            .verify-page {
+                padding: 20px 15px;
+            }
+
+            .verify-card {
+                padding: 30px 22px;
+                border-radius: 14px;
+            }
+
+            .verify-logo h1 {
+                font-size: 24px;
+            }
+
+            .verify-header h2 {
+                font-size: 22px;
+            }
+
+            .form-group input {
+                font-size: 18px;
+                letter-spacing: 5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="verify-page">
+
+        <section class="verify-card">
+
+            <div class="verify-logo">
+                <h1>Yankiii Barber Co.</h1>
+                <p>Barbering & Grooming</p>
+            </div>
+
+            <div class="verify-header">
+                <h2>Verify Your Code</h2>
+
+                <p>
+                    Enter the 6-digit verification code we sent to:
+                </p>
+
+                <div id="emailDisplay" class="email-display">
+                    Loading...
+                </div>
+            </div>
+
+            <div id="message" class="message"></div>
+
+            <form id="verifyForm">
+
+                <div class="form-group">
+                    <label for="code">Verification Code</label>
+
+                    <input
+                        type="text"
+                        id="code"
+                        name="code"
+                        placeholder="000000"
+                        inputmode="numeric"
+                        autocomplete="one-time-code"
+                        maxlength="6"
+                        pattern="[0-9]{6}"
+                        required
+                    >
+                </div>
+
+                <button
+                    type="submit"
+                    class="verify-btn"
+                    id="verifyBtn"
+                >
+                    Verify Code
+                </button>
+
+            </form>
+
+            <div class="back-link">
+                <a href="forgot-password">← Use a different email</a>
+            </div>
+
+        </section>
+
+    </main>
+
+    <script>
+        const email = sessionStorage.getItem('passwordResetEmail');
+
+        const emailDisplay = document.getElementById('emailDisplay');
+        const form = document.getElementById('verifyForm');
+        const codeInput = document.getElementById('code');
+        const verifyBtn = document.getElementById('verifyBtn');
+        const message = document.getElementById('message');
+
+        // Make sure the user came from the forgot-password page
+        if (!email) {
+            window.location.href = 'forgot-password';
+        } else {
+            emailDisplay.textContent = email;
+        }
+
+        // Allow numbers only
+        codeInput.addEventListener('input', () => {
+            codeInput.value = codeInput.value
+                .replace(/\D/g, '')
+                .slice(0, 6);
+        });
+
+        function showMessage(text, type) {
+            message.textContent = text;
+            message.className = `message ${type}`;
+        }
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const code = codeInput.value.trim();
+
+            if (!/^\d{6}$/.test(code)) {
+                showMessage(
+                    'Please enter the 6-digit verification code.',
+                    'error'
+                );
+                return;
+            }
+
+            verifyBtn.disabled = true;
+            verifyBtn.textContent = 'Verifying...';
+
+            message.className = 'message';
+
+            try {
+                const response = await fetch(
+                    '/api/auth/verify-reset-code',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            email,
+                            code
+                        })
+                    }
+                );
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+
+                    // Keep the email and code for the password reset step
+                    // Store the secure reset token for the final password reset step
+                    sessionStorage.setItem(
+                        'passwordResetToken',
+                        data.resetToken
+                    );
+                                    
+                    window.location.href =
+                        'reset-password.html';
+                    
+                    return;
+                }
+
+                showMessage(
+                    data.message ||
+                    'Invalid or expired verification code.',
+                    'error'
+                );
+
+            } catch (error) {
+
+                console.error(
+                    'Verification error:',
+                    error
+                );
+
+                showMessage(
+                    'Unable to connect to the server. Please try again.',
+                    'error'
+                );
+
+            } finally {
+
+                verifyBtn.disabled = false;
+                verifyBtn.textContent = 'Verify Code';
+            }
+        });
+    </script>
+
+</body>
+</html>

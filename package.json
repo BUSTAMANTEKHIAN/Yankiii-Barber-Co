@@ -1,0 +1,31 @@
+{
+  "name": "yankiii-barber-co",
+  "version": "1.0.0",
+  "description": "Premium Full-Stack Barbershop Appointment & Booking Platform",
+  "main": "server/app.js",
+  "scripts": {
+    "start": "node server/app.js",
+    "dev": "node --watch server/app.js",
+    "test": "node server/test-booking.js",
+    "db:init": "node database/init-db.js"
+  },
+  "keywords": [
+    "barbershop",
+    "booking-system",
+    "appointment-scheduler",
+    "express",
+    "mysql",
+    "javascript"
+  ],
+  "author": "Khian",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.9.7",
+    "nodemailer": "^10.0.10"
+  }
+}

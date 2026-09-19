@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Dashboard | Yankiii Barber Co.</title>
+    <meta name="description" content="Manage your upcoming barber appointments, view grooming cut history, and update your personal details.">
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- ================= NAVBAR ================= -->
+    <header class="header">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                YANKIII
+                <span>BARBER CO.</span>
+            </a>
+
+            <nav class="navbar" id="navbar">
+                <a href="index.html">Home</a>
+                <a href="services.html">Services</a>
+                <a href="barbers.html">Barbers</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="booking.html" class="nav-book">Book Now</a>
+            </nav>
+
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle Navigation Menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="dashboard-page">
+        <div class="container">
+
+            <div class="dashboard-header">
+                <div class="dashboard-welcome">
+                    <h1>Welcome back, <span id="dashUserName">Client</span></h1>
+                    <p>Manage your appointments and chair reservations with Yankiii Barber Co.</p>
+                </div>
+
+                <a href="booking.html" class="btn btn-primary">
+                    <i class="fa-solid fa-plus"></i> Book New Appointment
+                </a>
+            </div>
+
+            <div class="dashboard-layout">
+                <!-- Sidebar -->
+                <aside class="dashboard-sidebar">
+                    <div class="user-profile-badge">
+                        <div class="user-avatar-circle" id="userAvatarLetter">U</div>
+                        <div>
+                            <h4 style="font-size: 16px; margin-bottom: 2px;" id="sidebarUserName">Client Name</h4>
+                            <span style="font-size: 12px; color: #65705f;" id="sidebarUserEmail">client@example.com</span>
+                        </div>
+                    </div>
+
+                    <nav class="dashboard-nav">
+                        <button type="button" class="dash-nav-btn active" onclick="switchTab('upcoming')" id="tabBtnUpcoming">
+                            <i class="fa-regular fa-calendar-check"></i>
+                            <span>Upcoming Appointments</span>
+                        </button>
+                        <button type="button" class="dash-nav-btn" onclick="switchTab('history')" id="tabBtnHistory">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                            <span>Booking History</span>
+                        </button>
+                        <button type="button" class="dash-nav-btn logout" onclick="logoutUser()">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                            <span>Sign Out</span>
+                        </button>
+                    </nav>
+                </aside>
+
+                <!-- Content Area -->
+                <section class="dashboard-content">
+                    <!-- Tab 1: Upcoming -->
+                    <div id="tabContentUpcoming">
+                        <h2 style="font-family: 'Playfair Display', serif; font-size: 22px; margin-bottom: 20px;">
+                            Upcoming Appointments
+                        </h2>
+
+                        <div id="upcomingList">
+                            <!-- Injected dynamically by dashboard.js -->
+                            <div class="empty-state">
+                                <i class="fa-regular fa-calendar"></i>
+                                <h3>No upcoming appointments</h3>
+                                <p>Ready for your next precision cut or fade?</p>
+                                <a href="booking.html" class="btn btn-primary btn-sm">Schedule Now</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: History -->
+                    <div id="tabContentHistory" style="display: none;">
+                        <h2 style="font-family: 'Playfair Display', serif; font-size: 22px; margin-bottom: 20px;">
+                            Appointment History
+                        </h2>
+
+                        <div id="historyList">
+                            <!-- Injected dynamically by dashboard.js -->
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Cancellation Confirmation Modal -->
+    <div class="modal-backdrop" id="cancelModal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3>Cancel Appointment</h3>
+                <button type="button" class="modal-close" onclick="closeCancelModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 15px; color: var(--dark); margin-bottom: 12px;">
+                    Are you sure you want to cancel this appointment?
+                </p>
+                <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: var(--radius-sm); padding: 12px; font-size: 13px; color: #991b1b;">
+                    <i class="fa-solid fa-triangle-exclamation" style="margin-right: 4px;"></i>
+                    This action frees your reserved chair for other clients. Cancelled appointments remain in your history.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline btn-sm" onclick="closeCancelModal()">Keep Appointment</button>
+                <button type="button" class="btn btn-danger btn-sm" id="confirmCancelBtn" onclick="executeCancellation()">Cancel Appointment</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= FOOTER ================= -->
+    <footer class="footer">
+        <div class="container footer-bottom" style="border-top:none;">
+            <p>© 2026 Yankiii Barber Co. All rights reserved.</p>
+            <p>Designed & Developed by Khian</p>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+
+</html>
+

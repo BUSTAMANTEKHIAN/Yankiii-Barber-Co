@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmed | Yankiii Barber Co.</title>
+    <meta name="description" content="Your appointment with Yankiii Barber Co. has been successfully reserved. Review your booking details and reference code.">
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        .confirmation-wrap {
+            max-width: 640px;
+            margin: 60px auto 100px;
+            background: var(--white);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 40px rgba(45, 58, 42, 0.08);
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .confirmation-banner {
+            background: var(--dark);
+            color: var(--white);
+            padding: 45px 30px;
+            position: relative;
+        }
+
+        .check-badge {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: var(--white);
+            font-size: 32px;
+            display: grid;
+            place-items: center;
+            margin: 0 auto 18px;
+            box-shadow: 0 0 0 8px rgba(167, 201, 155, 0.25);
+        }
+
+        .confirmation-details {
+            padding: 35px 40px;
+            text-align: left;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-row .label {
+            color: #65705f;
+            font-weight: 500;
+        }
+
+        .detail-row .value {
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .ref-box {
+            background: var(--light);
+            border: 1.5px dashed var(--secondary);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ref-box strong {
+            font-family: monospace;
+            font-size: 18px;
+            color: var(--primary);
+            letter-spacing: 1px;
+        }
+
+        .confirmation-actions {
+            padding: 24px 40px 40px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 600px) {
+            .confirmation-wrap {
+                margin: 30px 15px 70px;
+            }
+            .confirmation-details, .confirmation-actions {
+                padding: 20px;
+            }
+            .confirmation-actions .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ================= NAVBAR ================= -->
+    <header class="header">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                YANKIII
+                <span>BARBER CO.</span>
+            </a>
+
+            <nav class="navbar" id="navbar">
+                <a href="index.html">Home</a>
+                <a href="services.html">Services</a>
+                <a href="barbers.html">Barbers</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="booking.html" class="nav-book">Book Now</a>
+            </nav>
+
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle Navigation Menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="confirmation-wrap">
+                <div class="confirmation-banner">
+                    <div class="check-badge">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                    <span class="eyebrow" style="color: var(--secondary);">APPOINTMENT RESERVED</span>
+                    <h1 style="font-family: 'Playfair Display', serif; font-size: 32px; margin-bottom: 8px;">
+                        Booking Confirmed
+                    </h1>
+                    <p style="color: #b5c0b0; font-size: 15px;">
+                        Thank you, <span id="confCustomerName">Valued Client</span>. Your chair is secured!
+                    </p>
+                </div>
+
+                <div class="confirmation-details">
+                    <div class="ref-box">
+                        <div>
+                            <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #65705f;">Booking Reference</div>
+                            <strong id="confRefCode">YBC-20260925-001</strong>
+                        </div>
+                        <span class="badge badge-pending" id="confStatusBadge">Pending</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="label">Service</span>
+                        <span class="value" id="confService">Signature Fade</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="label">Barber</span>
+                        <span class="value" id="confBarber">Mark Santos</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="label">Date</span>
+                        <span class="value" id="confDate">September 25, 2026</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="label">Time</span>
+                        <span class="value" id="confTime">10:30 AM</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="label">Total to Pay at Shop</span>
+                        <span class="value" style="color: var(--primary); font-size: 16px;" id="confPrice">₱350</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="label">Location</span>
+                        <span class="value">Biñan, Laguna</span>
+                    </div>
+                </div>
+
+                <div class="confirmation-actions">
+                    <a href="dashboard.html" class="btn btn-primary" id="viewAppointmentBtn">
+                        <i class="fa-regular fa-calendar-check"></i> View My Appointments
+                    </a>
+                    <a href="index.html" class="btn btn-outline">
+                        Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ================= FOOTER ================= -->
+    <footer class="footer">
+        <div class="container footer-bottom" style="border-top:none;">
+            <p>© 2026 Yankiii Barber Co. All rights reserved.</p>
+            <p>Designed & Developed by Khian</p>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const refFromUrl = urlParams.get('ref');
+
+            let bookingData = null;
+            try {
+                bookingData = JSON.parse(sessionStorage.getItem('ybc_confirmed_booking'));
+            } catch (e) {}
+
+            if (bookingData) {
+                if (bookingData.customer_name) {
+                    document.getElementById('confCustomerName').textContent = bookingData.customer_name;
+                }
+                if (bookingData.booking_reference) {
+                    document.getElementById('confRefCode').textContent = bookingData.booking_reference;
+                }
+                if (bookingData.service_name) {
+                    document.getElementById('confService').textContent = bookingData.service_name;
+                }
+                if (bookingData.barber_name) {
+                    document.getElementById('confBarber').textContent = bookingData.barber_name;
+                }
+                if (bookingData.booking_date) {
+                    const d = new Date(bookingData.booking_date + 'T00:00:00');
+                    document.getElementById('confDate').textContent = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+                }
+                if (bookingData.start_time) {
+                    const [hStr, mStr] = bookingData.start_time.split(':');
+                    let h = parseInt(hStr, 10);
+                    const ampm = h >= 12 ? 'PM' : 'AM';
+                    h = h % 12 || 12;
+                    document.getElementById('confTime').textContent = `${h}:${mStr || '00'} ${ampm}`;
+                }
+                if (bookingData.total_price) {
+                    document.getElementById('confPrice').textContent = `₱${Number(bookingData.total_price).toLocaleString()}`;
+                }
+                if (bookingData.status) {
+                    const badge = document.getElementById('confStatusBadge');
+                    badge.className = `badge badge-${bookingData.status.toLowerCase()}`;
+                    badge.textContent = bookingData.status.toUpperCase();
+                }
+            } else if (refFromUrl) {
+                document.getElementById('confRefCode').textContent = refFromUrl;
+            }
+        });
+    </script>
+</body>
+
+</html>
+
