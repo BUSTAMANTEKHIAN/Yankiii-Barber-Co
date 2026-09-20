@@ -26,7 +26,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Serve static frontend files from project root
-const clientPath = path.join(__dirname, '..');
+const clientPath = path.join(__dirname, '../public');
+
 app.use(express.static(clientPath));
 
 const pages = {
