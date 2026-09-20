@@ -2,11 +2,14 @@
  * Yankiii Barber Co. — Main Application Entry Point
  * Express HTTP Server, Static Asset Delivery, and REST API Dispatcher.
  */
-require('dotenv').config();
+const path = require('path');
+
+require('dotenv').config({
+    path: path.join(__dirname, '../.env')
+});
 
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 
 const authRoutes = require('./routes/authRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');

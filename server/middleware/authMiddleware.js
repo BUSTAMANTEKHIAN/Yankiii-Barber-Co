@@ -7,7 +7,11 @@ const jwt = require('jsonwebtoken');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
-const JWT_SECRET = process.env.JWT_SECRET || 'yankiii_barber_co_super_secret_jwt_key_2026';
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+    throw new Error('JWT_SECRET is not configured.');
+}
 
 function verifyToken(req, res, next) {
     const authHeader = req.headers['authorization'];
