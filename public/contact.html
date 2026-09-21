@@ -83,7 +83,7 @@
                                 </div>
                                 <div>
                                     <h4 style="font-size: 16px; margin-bottom: 4px;">Phone & Viber</h4>
-                                    <p style="font-size: 14px; color: #65705f;">+63 912 345 6789</p>
+                                    <p style="font-size: 14px; color: #65705f;">+639510699549</p>
                                 </div>
                             </div>
 
@@ -94,7 +94,7 @@
                                 </div>
                                 <div>
                                     <h4 style="font-size: 16px; margin-bottom: 4px;">Email Inquiries</h4>
-                                    <p style="font-size: 14px; color: #65705f;">contact@yankiiibarber.com</p>
+                                    <p style="font-size: 14px; color: #65705f;">khianbustamante1@gmail.com</p>
                                 </div>
                             </div>
 
@@ -215,32 +215,88 @@
 
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
-    <script>
-        function handleContactSubmit(e) {
-            e.preventDefault();
-            const btn = document.getElementById('contactSubmitBtn');
-            const name = document.getElementById('contactName').value.trim();
-            const email = document.getElementById('contactEmail').value.trim();
-            const subject = document.getElementById('contactSubject').value.trim();
-            const message = document.getElementById('contactMessage').value.trim();
+<script>
+    async function handleContactSubmit(e) {
+        e.preventDefault();
 
-            if (!name || !email || !subject || !message) {
-                window.showToast('Please fill out all required fields.', 'error');
-                return;
+        const btn = document.getElementById('contactSubmitBtn');
+
+        const name = document.getElementById('contactName').value.trim();
+        const email = document.getElementById('contactEmail').value.trim();
+        const subject = document.getElementById('contactSubject').value.trim();
+        const message = document.getElementById('contactMessage').value.trim();
+
+        if (!name || !email || !subject || !message) {
+            window.showToast(
+                'Please fill out all required fields.',
+                'error'
+            );
+            return;
+        }
+
+        btn.disabled = true;
+
+        btn.innerHTML =
+            '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+
+        try {
+
+            const response = await fetch('/api/contact', {
+                method: 'POST',
+
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+
+                body: JSON.stringify({
+                    name,
+                    email,
+                    subject,
+                    message
+                })
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(
+                    result.message || 'Failed to send message.'
+                );
             }
 
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+            // Clear form
+            document.getElementById('contactForm').reset();
 
-            setTimeout(() => {
-                document.getElementById('contactForm').reset();
-                document.getElementById('contactSuccessMsg').style.display = 'block';
-                btn.disabled = false;
-                btn.innerHTML = 'Send Message <i class="fa-solid fa-paper-plane"></i>';
-                window.showToast('Message sent successfully!', 'success');
-            }, 700);
+            // Show success message
+            document.getElementById(
+                'contactSuccessMsg'
+            ).style.display = 'block';
+
+            window.showToast(
+                'Message sent successfully!',
+                'success'
+            );
+
+        } catch (error) {
+
+            console.error('Contact form error:', error);
+
+            window.showToast(
+                error.message ||
+                'Unable to send your message. Please try again.',
+                'error'
+            );
+
+        } finally {
+
+            btn.disabled = false;
+
+            btn.innerHTML =
+                'Send Message <i class="fa-solid fa-paper-plane"></i>';
         }
-    </script>
+    }
+</script>
+
 </body>
 
 </html>

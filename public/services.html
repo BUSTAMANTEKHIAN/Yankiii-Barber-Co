@@ -114,7 +114,7 @@
                             <p>Complete grooming session including full haircut of choice, beard sculpting, line-up, organic beard oil, and hot towel.</p>
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
                                 <span class="duration"><i class="fa-regular fa-clock"></i> 60 min</span>
-                                <a href="booking.html?service_id=3" class="btn btn-sm btn-outline">Book Service</a>
+                                <a href="booking.html?service_id=3" class="btn btn-sm btn-outline"onclick="return requireBookingLogin(event)">Book Service</a>
                             </div>
                         </div>
                     </article>
@@ -132,7 +132,7 @@
                             <p>The total executive package: Signature Fade, beard grooming, exfoliating facial cleanse, hot lather shave, scalp massage, and tonic styling.</p>
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
                                 <span class="duration"><i class="fa-regular fa-clock"></i> 75 min</span>
-                                <a href="booking.html?service_id=4" class="btn btn-sm btn-outline">Book Service</a>
+                                <a href="booking.html?service_id=4" class="btn btn-sm btn-outline" onclick="return requireBookingLogin(event)">Book Service</a>
                             </div>
                         </div>
                     </article>
@@ -238,6 +238,8 @@
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
     <script src="js/services.js"></script>
+    <script src="js/booking-guard.js"></script>
+    
 </body>
 
 </html>

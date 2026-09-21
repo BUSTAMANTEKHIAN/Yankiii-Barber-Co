@@ -82,7 +82,9 @@
 
                     <div class="hero-buttons">
 
-                        <a href="booking.html" class="btn btn-primary">
+                        <a href="booking.html"
+                           class="btn btn-primary"
+                           onclick="return requireBookingLogin(event)">
                             Book an Appointment
                             <i class="fa-solid fa-arrow-right"></i>
                         </a>
@@ -808,6 +810,7 @@
 
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/booking-guard.js"></script>
 
 </body>
 

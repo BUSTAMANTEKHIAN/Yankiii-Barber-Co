@@ -28,8 +28,11 @@
                 <a href="barbers.html">Barbers</a>
                 <a href="about.html">About</a>
                 <a href="contact.html">Contact</a>
-                <a href="booking.html" class="nav-book active">Book Now</a>
-            </nav>
+                <a href="booking.html"
+                   class="nav-book"
+                   onclick="return requireBookingLogin(event)">
+                    Book Now
+                </a>            </nav>
 
             <button class="menu-toggle" id="menuToggle" aria-label="Toggle Navigation Menu">
                 <i class="fa-solid fa-bars"></i>
@@ -389,6 +392,8 @@
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
     <script src="js/booking.js"></script>
+    <script src="js/booking-guard.js"></script>
+    
 </body>
 
 </html>
