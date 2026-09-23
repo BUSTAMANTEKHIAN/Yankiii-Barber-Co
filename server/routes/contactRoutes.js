@@ -24,7 +24,7 @@ router.post('/', async (req, res) => {
         } = req.body;
 
         // Validate required fields
-        if (!name || !email || !subject || !message) {
+        if ([name, email, subject, message].some(value => typeof value !== 'string' || !value.trim())) {
             return res.status(400).json({
                 success: false,
                 message: 'Please fill out all required fields.'
@@ -34,7 +34,7 @@ router.post('/', async (req, res) => {
         // Basic email validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-        if (!emailRegex.test(email)) {
+        if (name.trim().length > 100 || email.trim().length > 150 || subject.trim().length > 120 || message.length > 5000 || !emailRegex.test(email.trim())) {
             return res.status(400).json({
                 success: false,
                 message: 'Please enter a valid email address.'
@@ -45,17 +45,17 @@ router.post('/', async (req, res) => {
         await transporter.sendMail({
             from: `"Yankiii Barber Co. Website" <${process.env.MAIL_USER}>`,
             to: process.env.MAIL_USER,
-            replyTo: email,
-            subject: `Contact Form: ${subject}`,
+            replyTo: email.trim(),
+            subject: `Contact Form: ${subject.trim().replace(/[\r\n]/g, ' ').slice(0, 120)}`,
 
             text: `
 YANKIII BARBER CO.
 NEW CONTACT MESSAGE
 ==============================
 
-Name: ${name}
-Email: ${email}
-Subject: ${subject}
+Name: ${name.trim()}
+Email: ${email.trim()}
+Subject: ${subject.trim()}
 
 Message:
 ${message}
@@ -134,7 +134,7 @@ Yankiii Barber Co. website contact form.
             `
         });
 
-        console.log(`📧 Contact message received from ${email}`);
+        console.log('Contact message delivered.');
 
         return res.status(200).json({
             success: true,

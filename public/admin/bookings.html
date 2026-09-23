@@ -3,127 +3,581 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Bookings | Yankiii Barber Co. Admin</title>
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Bookings Management | Yankiii Barber Co.</title>
+
+    <meta
+        name="description"
+        content="Manage Yankiii Barber Co. appointments, booking statuses, customer details, and schedules."
+    >
+
+    <meta name="robots" content="noindex, nofollow">
+
+    <link rel="icon" type="image/png" href="../assets/logo/logo.png">
 
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/admin.css">
     <link rel="stylesheet" href="../css/responsive.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+<style>
+        .sr-only {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+        }
+    </style>
 </head>
 
 <body class="admin-body">
 
-    <!-- ================= SIDEBAR ================= -->
-    <aside class="admin-sidebar" id="adminSidebar">
-        <div class="admin-sidebar-brand">
-            <a href="dashboard.html" class="logo">
-                YANKIII <span>ADMIN</span>
+    <!-- =====================================================
+         ADMIN SIDEBAR
+    ====================================================== -->
+
+    <aside
+        class="admin-sidebar"
+        id="adminSidebar"
+    >
+
+        <div class="admin-sidebar-header">
+
+            <a
+                href="dashboard.html"
+                class="admin-logo"
+            >
+                <img
+                    src="../assets/logo/logo.png"
+                    alt="Yankiii Barber Co."
+                >
             </a>
-            <button class="modal-close" style="color:#b5c0b0; display:none;" id="sidebarCloseBtn" onclick="toggleSidebar()">&times;</button>
+
+            <button
+                type="button"
+                class="sidebar-close"
+                id="sidebarCloseBtn"
+                onclick="toggleSidebar()"
+                aria-label="Close admin menu"
+            >
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
         </div>
+
 
         <nav class="admin-nav">
-            <a href="dashboard.html"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
-            <a href="bookings.html" class="active"><i class="fa-regular fa-calendar-check"></i> Bookings</a>
-            <a href="services.html"><i class="fa-solid fa-scissors"></i> Services</a>
-            <a href="barbers.html"><i class="fa-solid fa-user-tie"></i> Barbers</a>
-            <a href="customers.html"><i class="fa-solid fa-users"></i> Customers</a>
-            <a href="settings.html"><i class="fa-solid fa-clock"></i> Business Hours</a>
+
+            <a href="dashboard.html">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a
+                href="bookings.html"
+                class="active"
+            >
+                <i class="fa-solid fa-calendar-check"></i>
+                <span>Bookings</span>
+            </a>
+
+            <a href="services.html">
+                <i class="fa-solid fa-scissors"></i>
+                <span>Services</span>
+            </a>
+
+            <a href="barbers.html">
+                <i class="fa-solid fa-user-tie"></i>
+                <span>Barbers</span>
+            </a>
+
+            <a href="customers.html">
+                <i class="fa-solid fa-users"></i>
+                <span>Customers</span>
+            </a>
+
+            <a href="settings.html">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+
         </nav>
 
-        <div class="admin-nav-footer">
-            <a href="../index.html" target="_blank" style="display: flex; align-items: center; gap: 8px; color: #b5c0b0; font-size: 13px; margin-bottom: 12px;">
-                <i class="fa-solid fa-arrow-up-right-from-square"></i> View Live Website
+
+        <div class="admin-sidebar-footer">
+
+            <a href="../index.html" target="_blank">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                <span>View Website</span>
             </a>
-            <button type="button" onclick="logoutAdmin()" class="btn btn-sm btn-outline btn-block" style="border-color:#465143;color:#e6f4e6;">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+
+            <button
+                type="button"
+                onclick="logoutAdmin()"
+            >
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
             </button>
+
         </div>
+
     </aside>
 
-    <!-- ================= MAIN ================= -->
+    <div
+        class="admin-sidebar-overlay"
+        id="adminSidebarOverlay"
+        aria-hidden="true"
+    ></div>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
     <div class="admin-main">
+
+        <!-- TOP BAR -->
+
         <header class="admin-topbar">
+
             <div class="admin-topbar-left">
-                <button type="button" class="admin-toggle-btn" onclick="toggleSidebar()">
+
+                <button
+                    type="button"
+                    class="sidebar-toggle"
+                    onclick="toggleSidebar()"
+                    aria-label="Open admin menu"
+                    aria-expanded="false"
+                >
                     <i class="fa-solid fa-bars"></i>
                 </button>
-                <h2 style="font-size: 18px; font-weight: 700;">Appointment Bookings</h2>
+
+                <div class="admin-topbar-title">
+                    <span class="eyebrow">YANKIII BARBER CO.</span>
+                    <h1>Bookings</h1>
+                </div>
+
             </div>
-            <div class="admin-topbar-right">
-                <span id="bookingCountBadge" class="badge badge-confirmed">Loading...</span>
+
+
+            <div class="admin-user">
+
+                <div>
+                    <span>Administrator</span>
+
+                    <strong id="adminUserDisplayName">
+                        Admin
+                    </strong>
+                </div>
+
+                <div class="admin-user-avatar">
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
+
             </div>
+
         </header>
 
-        <main class="admin-content-body">
-            <div class="data-panel">
-                <div class="data-panel-header">
-                    <h3>All Appointments</h3>
-                    <div class="table-toolbar">
-                        <input type="text" id="bookingSearchInput" class="table-search-input" placeholder="Search reference, customer, barber..." oninput="filterBookingsTable()">
-                        <select id="bookingStatusFilter" class="table-filter-select" onchange="filterBookingsTable()">
-                            <option value="all">All Statuses</option>
+
+        <!-- CONTENT -->
+
+        <main class="admin-content">
+
+            <!-- PAGE HEADER -->
+
+            <div class="admin-page-header">
+
+                <div>
+
+                    <span class="eyebrow">
+                        APPOINTMENT MANAGEMENT
+                    </span>
+
+                    <h2>
+                        Booking Management
+                    </h2>
+
+                    <p>
+                        Review, search, and manage customer appointments.
+                    </p>
+
+                </div>
+
+
+                <div class="admin-page-header-actions">
+                    <span id="bookingCountBadge" class="admin-count-badge">
+                        <i class="fa-regular fa-calendar-check"></i>
+                        <span>0 Appointments</span>
+                    </span>
+
+                    <button
+                        type="button"
+                        class="btn btn-outline admin-refresh-btn"
+                        id="bookingRefreshBtn"
+                        onclick="refreshBookingsPage()"
+                    >
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>Refresh</span>
+                    </button>
+                </div>
+
+            </div>
+
+
+            <!-- FILTER CARD -->
+
+            <section class="admin-card booking-filter-card" aria-labelledby="bookingFiltersTitle">
+                <div class="admin-card-header booking-filter-header">
+                    <div>
+                        <div class="booking-section-title">
+                            <span class="booking-section-icon">
+                                <i class="fa-solid fa-filter"></i>
+                            </span>
+                            <div>
+                                <h3 id="bookingFiltersTitle">Find an appointment</h3>
+                                <p>Search by booking ID, customer, service, barber, or phone number.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="btn btn-ghost btn-sm booking-clear-btn"
+                        onclick="clearBookingFilters()"
+                    >
+                        <i class="fa-solid fa-rotate-left"></i>
+                        Clear filters
+                    </button>
+                </div>
+
+                <div class="admin-filter-bar booking-filter-grid">
+                    <label class="admin-search-wrap booking-search-field">
+                        <span class="sr-only">Search appointments</span>
+                        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                        <input
+                            type="search"
+                            id="bookingSearchInput"
+                            class="form-control"
+                            placeholder="Search appointments..."
+                            autocomplete="off"
+                            aria-label="Search appointments"
+                            oninput="filterBookingsTable()"
+                        >
+                    </label>
+
+                    <label class="booking-status-field">
+                        <span class="booking-field-label">Status</span>
+                        <select
+                            id="bookingStatusFilter"
+                            class="form-control"
+                            onchange="filterBookingsTable()"
+                            aria-label="Filter appointments by status"
+                        >
+                            <option value="all">All statuses</option>
                             <option value="pending">Pending</option>
                             <option value="confirmed">Confirmed</option>
                             <option value="completed">Completed</option>
                             <option value="cancelled">Cancelled</option>
                         </select>
+                    </label>
+                </div>
+
+                <div class="booking-filter-hint" aria-live="polite">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>Use the filters above to quickly find a customer's appointment.</span>
+                </div>
+            </section>
+
+
+            <!-- BOOKINGS TABLE -->
+
+            <section class="admin-card booking-table-card" aria-labelledby="bookingTableTitle">
+                <div class="booking-table-heading">
+                    <div>
+                        <span class="eyebrow">APPOINTMENT LIST</span>
+                        <h3 id="bookingTableTitle">All bookings</h3>
+                    </div>
+                    <span class="booking-live-indicator">
+                        <span class="booking-live-dot"></span>
+                        Live data
+                    </span>
+                </div>
+
+                <div class="table-responsive booking-table-wrap">
+
+                    <table class="admin-table booking-table">
+                        <caption class="sr-only">Customer appointments and booking actions</caption>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Booking ID
+                                </th>
+
+                                <th>
+                                    Customer
+                                </th>
+
+                                <th>
+                                    Service
+                                </th>
+
+                                <th>
+                                    Barber
+                                </th>
+
+                                <th>
+                                    Date
+                                </th>
+
+                                <th>
+                                    Time
+                                </th>
+
+                                <th>
+                                    Price
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Actions
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="bookingsTableBody">
+
+                            <tr>
+
+                                <td
+                                    colspan="9"
+                                    class="api-state booking-loading-state"
+                                >
+
+                                    <i class="fa-solid fa-circle-notch fa-spin"></i>
+
+                                    <div>
+                                        Loading bookings...
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <!-- =====================================================
+         BOOKING DETAILS MODAL
+    ====================================================== -->
+
+    <div
+        class="modal-backdrop booking-modal-backdrop"
+        id="bookingDetailsModal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="bookingDetailsTitle"
+        aria-hidden="true"
+    >
+        <div class="modal-dialog booking-modal-dialog">
+
+            <div class="modal-header booking-modal-header">
+                <div class="booking-modal-heading">
+                    <span class="booking-modal-icon">
+                        <i class="fa-solid fa-calendar-check"></i>
+                    </span>
+                    <div>
+                        <span class="eyebrow">APPOINTMENT</span>
+                        <h3 id="bookingDetailsTitle">Booking Details</h3>
                     </div>
                 </div>
 
-                <div class="table-responsive">
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>Ref Code</th>
-                                <th>Customer & Contact</th>
-                                <th>Service & Duration</th>
-                                <th>Barber</th>
-                                <th>Appointment Date</th>
-                                <th>Time</th>
-                                <th>Price</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="bookingsTableBody">
-                            <tr>
-                                <td colspan="9" style="text-align: center; padding: 30px; color: #65705f;">
-                                    <i class="fa-solid fa-spinner fa-spin"></i> Loading bookings...
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <button
+                    type="button"
+                    class="modal-close"
+                    onclick="closeDetailsModal()"
+                    aria-label="Close booking details"
+                >
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
-        </main>
+
+
+            <div
+                class="modal-body"
+                id="bookingDetailsBody"
+            >
+            </div>
+
+
+            <div class="modal-footer booking-modal-footer">
+                <button
+                    type="button"
+                    class="btn btn-outline"
+                    onclick="closeDetailsModal()"
+                >
+                    <i class="fa-solid fa-check"></i>
+                    Done
+                </button>
+            </div>
+
+        </div>
+
     </div>
 
-    <!-- View Booking Details / Notes Modal -->
-    <div class="modal-backdrop" id="bookingDetailsModal">
-        <div class="modal-dialog">
-            <div class="modal-header">
-                <h3>Booking Details</h3>
-                <button type="button" class="modal-close" onclick="closeDetailsModal()">&times;</button>
-            </div>
-            <div class="modal-body" id="bookingDetailsBody">
-                <!-- Dynamically filled -->
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary btn-sm" onclick="closeDetailsModal()">Close</button>
-            </div>
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer class="admin-footer">
+
+        <div class="admin-footer-row">
+
+            <span>
+                © 2026 Yankiii Barber Co.
+            </span>
+
+            <span>
+                Admin Portal
+            </span>
+
         </div>
-    </div>
+
+    </footer>
+
+
+    <!-- =====================================================
+         SCRIPTS
+    ====================================================== -->
 
     <script src="../js/api.js"></script>
     <script src="../js/admin.js"></script>
+
+    <script src="/js/cookie-consent.js"></script>
+
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            initBookingsPage();
-        });
+        (function () {
+            'use strict';
+
+            window.refreshBookingsPage = function () {
+                const button = document.getElementById('bookingRefreshBtn');
+
+                if (button) {
+                    button.classList.add('is-loading');
+                    button.disabled = true;
+                }
+
+                Promise.resolve(
+                    typeof window.initBookingsPage === 'function'
+                        ? window.initBookingsPage()
+                        : null
+                ).finally(function () {
+                    if (button) {
+                        button.classList.remove('is-loading');
+                        button.disabled = false;
+                    }
+                });
+            };
+
+            window.clearBookingFilters = function () {
+                const search = document.getElementById('bookingSearchInput');
+                const status = document.getElementById('bookingStatusFilter');
+
+                if (search) search.value = '';
+                if (status) status.value = 'all';
+
+                if (typeof window.filterBookingsTable === 'function') {
+                    window.filterBookingsTable();
+                }
+            };
+
+            function syncSidebarOverlay() {
+                const sidebar = document.getElementById('adminSidebar');
+                const overlay = document.getElementById('adminSidebarOverlay');
+
+                if (!sidebar || !overlay) return;
+
+                const open = sidebar.classList.contains('open');
+                overlay.classList.toggle('visible', open);
+                overlay.setAttribute('aria-hidden', String(!open));
+                document.body.classList.toggle('admin-menu-open', open);
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                if (typeof window.initBookingsPage === 'function') {
+                    window.initBookingsPage();
+                }
+
+                const overlay = document.getElementById('adminSidebarOverlay');
+                if (overlay) {
+                    overlay.addEventListener('click', function () {
+                        if (typeof window.toggleSidebar === 'function') {
+                            window.toggleSidebar();
+                        }
+                        syncSidebarOverlay();
+                    });
+                }
+
+                const sidebar = document.getElementById('adminSidebar');
+                if (sidebar) {
+                    const observer = new MutationObserver(syncSidebarOverlay);
+                    observer.observe(sidebar, {
+                        attributes: true,
+                        attributeFilter: ['class']
+                    });
+                }
+
+                syncSidebarOverlay();
+            });
+
+            document.addEventListener('click', function (event) {
+                const modal = document.getElementById('bookingDetailsModal');
+
+                if (modal && event.target === modal) {
+                    closeDetailsModal();
+                }
+            });
+
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape' && typeof window.closeDetailsModal === 'function') {
+                    closeDetailsModal();
+                }
+            });
+        })();
     </script>
+
 </body>
 
 </html>
-

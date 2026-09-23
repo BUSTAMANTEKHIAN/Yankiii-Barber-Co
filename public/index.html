@@ -21,6 +21,7 @@
     >
 </head>
 
+
 <body>
 
     <!-- ================= NAVBAR ================= -->
@@ -29,25 +30,54 @@
 
         <div class="container nav-container">
 
-        <a href="index.html" class="logo">
-            <img src="assets\logo\logo.png" alt="Yankiii Barber Co.">
-        </a>
+            <a href="index.html" class="logo">
+
+                <img
+                    src="assets/logo/logo.png"
+                    alt="Yankiii Barber Co."
+                >
+
+            </a>
+
 
             <nav class="navbar" id="navbar">
 
-                <a href="index.html" class="active">Home</a>
-                <a href="services.html">Services</a>
-                <a href="barbers.html">Barbers</a>
-                <a href="about.html">About</a>
-                <a href="contact.html">Contact</a>
+                <a href="index.html" class="active">
+                    Home
+                </a>
 
-                <a href="booking.html" class="nav-book">
+                <a href="services.html">
+                    Services
+                </a>
+
+                <a href="barbers.html">
+                    Barbers
+                </a>
+
+                <a href="about.html">
+                    About
+                </a>
+
+                <a href="contact.html">
+                    Contact
+                </a>
+
+                <a
+                    href="booking.html"
+                    class="nav-book"
+                    onclick="return requireBookingLogin(event)"
+                >
                     Book Now
                 </a>
 
             </nav>
 
-            <button class="menu-toggle" id="menuToggle">
+
+            <button
+                class="menu-toggle"
+                id="menuToggle"
+                aria-label="Toggle Navigation Menu"
+            >
                 <i class="fa-solid fa-bars"></i>
             </button>
 
@@ -58,11 +88,13 @@
 
     <main>
 
+
         <!-- ================= HERO ================= -->
 
         <section class="hero">
 
             <div class="container hero-container">
+
 
                 <div class="hero-content">
 
@@ -70,30 +102,40 @@
                         YANKIII BARBER CO.
                     </span>
 
+
                     <h1>
                         Your Style.
                         <span>Your Standard.</span>
                     </h1>
+
 
                     <p>
                         Precision cuts, clean fades, and premium grooming
                         designed around your style.
                     </p>
 
+
                     <div class="hero-buttons">
 
-                        <a href="booking.html"
-                           class="btn btn-primary"
-                           onclick="return requireBookingLogin(event)">
+                        <a
+                            href="booking.html"
+                            class="btn btn-primary"
+                            onclick="return requireBookingLogin(event)"
+                        >
                             Book an Appointment
                             <i class="fa-solid fa-arrow-right"></i>
                         </a>
 
-                        <a href="services.html" class="btn btn-outline">
+
+                        <a
+                            href="services.html"
+                            class="btn btn-outline"
+                        >
                             Explore Services
                         </a>
 
                     </div>
+
 
                     <div class="hero-info">
 
@@ -119,15 +161,11 @@
 
                 <div class="hero-image">
 
-                    <!--
-                        REPLACE THIS IMAGE
-                        WITH YOUR OWN IMAGE
-                    -->
-
                     <img
                         src="assets/images/hero.jpg"
                         alt="Yankiii Barber Co. barber"
                     >
+
 
                     <div class="hero-badge">
 
@@ -142,9 +180,11 @@
 
                 </div>
 
+
             </div>
 
         </section>
+
 
 
         <!-- ================= SERVICES ================= -->
@@ -153,9 +193,11 @@
 
             <div class="container">
 
+
                 <div class="section-heading">
 
                     <div>
+
                         <span class="eyebrow">
                             WHAT WE DO
                         </span>
@@ -164,9 +206,14 @@
                             Crafted for
                             <span>Your Style.</span>
                         </h2>
+
                     </div>
 
-                    <a href="services.html" class="text-link">
+
+                    <a
+                        href="services.html"
+                        class="text-link"
+                    >
                         View All Services
                         <i class="fa-solid fa-arrow-right"></i>
                     </a>
@@ -174,7 +221,9 @@
                 </div>
 
 
+
                 <div class="service-grid">
+
 
                     <!-- SERVICE 1 -->
 
@@ -185,33 +234,45 @@
                             <img
                                 src="assets/images/service-1.jpg"
                                 alt="Classic haircut"
+                                loading="lazy"
                             >
 
                         </div>
+
 
                         <div class="service-content">
 
                             <div class="service-top">
 
-                                <h3>Classic Haircut</h3>
+                                <h3>
+                                    Classic Haircut
+                                </h3>
 
-                                <span>₱250</span>
+                                <span>
+                                    ₱250
+                                </span>
 
                             </div>
+
 
                             <p>
                                 A clean and timeless haircut tailored
                                 to your preferred style.
                             </p>
 
+
                             <span class="duration">
+
                                 <i class="fa-regular fa-clock"></i>
+
                                 30 min
+
                             </span>
 
                         </div>
 
                     </article>
+
 
 
                     <!-- SERVICE 2 -->
@@ -223,33 +284,45 @@
                             <img
                                 src="assets/images/service-2.jpg"
                                 alt="Fade haircut"
+                                loading="lazy"
                             >
 
                         </div>
+
 
                         <div class="service-content">
 
                             <div class="service-top">
 
-                                <h3>Signature Fade</h3>
+                                <h3>
+                                    Signature Fade
+                                </h3>
 
-                                <span>₱350</span>
+                                <span>
+                                    ₱350
+                                </span>
 
                             </div>
+
 
                             <p>
                                 Precision fading with detailed finishing
                                 for a sharp modern look.
                             </p>
 
+
                             <span class="duration">
+
                                 <i class="fa-regular fa-clock"></i>
+
                                 45 min
+
                             </span>
 
                         </div>
 
                     </article>
+
 
 
                     <!-- SERVICE 3 -->
@@ -261,33 +334,45 @@
                             <img
                                 src="assets/images/service-3.jpg"
                                 alt="Hair and beard service"
+                                loading="lazy"
                             >
 
                         </div>
+
 
                         <div class="service-content">
 
                             <div class="service-top">
 
-                                <h3>Hair & Beard</h3>
+                                <h3>
+                                    Hair &amp; Beard
+                                </h3>
 
-                                <span>₱450</span>
+                                <span>
+                                    ₱450
+                                </span>
 
                             </div>
+
 
                             <p>
                                 Complete grooming session including
                                 haircut and beard styling.
                             </p>
 
+
                             <span class="duration">
+
                                 <i class="fa-regular fa-clock"></i>
+
                                 60 min
+
                             </span>
 
                         </div>
 
                     </article>
+
 
                 </div>
 
@@ -296,19 +381,20 @@
         </section>
 
 
+
         <!-- ================= ABOUT ================= -->
 
         <section class="about section">
 
             <div class="container about-container">
 
-                <div class="about-image">
 
-                    <!-- YOUR IMAGE -->
+                <div class="about-image">
 
                     <img
                         src="assets/images/barber-1.jpg"
                         alt="Yankiii Barber Co."
+                        loading="lazy"
                     >
 
                 </div>
@@ -320,10 +406,12 @@
                         ABOUT YANKIII
                     </span>
 
+
                     <h2>
                         More Than
                         <span>Just a Haircut.</span>
                     </h2>
+
 
                     <p>
                         Yankiii Barber Co. was built around a simple idea:
@@ -331,14 +419,91 @@
                         confident.
                     </p>
 
+
                     <p>
                         From classic cuts to modern fades, every service
                         is delivered with attention to detail, consistency,
                         and personal style.
                     </p>
 
-                    <a href="about.html" class="btn btn-primary">
+
+                    <a
+                        href="about.html"
+                        class="btn btn-primary"
+                    >
                         Learn More
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ================= BARBERS ================= -->
+
+        <section class="barbers section">
+
+            <div class="container">
+
+
+                <div class="section-heading centered">
+
+                    <span class="eyebrow">
+                        THE TEAM
+                    </span>
+
+
+                    <h2>
+                        Meet Our
+                        <span>Barbers.</span>
+                    </h2>
+
+
+                    <p>
+                        Skilled barbers dedicated to making every
+                        appointment worth your time.
+                    </p>
+
+                </div>
+
+
+                <!--
+                    Barber cards are loaded dynamically
+                    from /api/barbers.
+
+                    The database is the single source of truth.
+                -->
+
+                <div
+                    class="barber-grid"
+                    id="homeBarbersContainer"
+                    aria-live="polite"
+                >
+
+                    <p class="api-state">
+                        Loading our barbers...
+                    </p>
+
+                </div>
+
+
+                <div
+                    style="
+                        text-align: center;
+                        margin-top: 30px;
+                    "
+                >
+
+                    <a
+                        href="barbers.html"
+                        class="btn btn-outline"
+                    >
+                        Meet All Barbers
                         <i class="fa-solid fa-arrow-right"></i>
                     </a>
 
@@ -349,122 +514,42 @@
         </section>
 
 
-        <!-- ================= BARBERS ================= -->
 
-        <section class="barbers section">
+        <!-- ================= WHY CHOOSE US ================= -->
+
+        <section
+            class="section"
+            style="background: #fafdfa;"
+        >
 
             <div class="container">
+
 
                 <div class="section-heading centered">
 
                     <span class="eyebrow">
-                        THE TEAM
+                        THE YANKIII STANDARD
                     </span>
 
+
                     <h2>
-                        Meet Our
-                        <span>Barbers.</span>
+                        Why Choose
+                        <span>Yankiii Barber Co.</span>
                     </h2>
 
+
                     <p>
-                        Skilled barbers dedicated to making every
-                        appointment worth your time.
+                        We blend classic craftsmanship with contemporary
+                        style for an elevated grooming experience.
                     </p>
 
                 </div>
 
 
-                <div class="barber-grid">
-
-                    <article class="barber-card">
-
-                        <div class="barber-image">
-
-                            <img
-                                src="assets/images/barber-1.jpg"
-                                alt="Khian Bustamante"
-                            >
-
-                        </div>
-
-                        <div class="barber-info">
-
-                            <h3>Khian Bustamante</h3>
-
-                            <span>Senior Barber</span>
-
-                        </div>
-
-                    </article>
-
-
-                    <article class="barber-card">
-
-                        <div class="barber-image">
-
-                            <img
-                                src="assets/images/barber-2.jpg"
-                                alt="Prince Traquena"
-                            >
-
-                        </div>
-
-                        <div class="barber-info">
-
-                            <h3>Prince Traquena</h3>
-
-                            <span>Fade Specialist</span>
-
-                        </div>
-
-                    </article>
-
-
-                    <article class="barber-card">
-
-                        <div class="barber-image">
-
-                            <img
-                                src="assets/images/barber-3.jpg"
-                                alt="Mark Almazan"
-                            >
-
-                        </div>
-
-                        <div class="barber-info">
-
-                            <h3>Mark Almazan</h3>
-
-                            <span>Grooming Specialist</span>
-
-                        </div>
-
-                    </article>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- ================= WHY CHOOSE US ================= -->
-
-        <section class="section" style="background: #fafdfa;">
-
-            <div class="container">
-
-                <div class="section-heading centered">
-
-                    <span class="eyebrow">THE YANKIII STANDARD</span>
-
-                    <h2>Why Choose <span>Yankiii Barber Co.</span></h2>
-
-                    <p>We blend classic craftsmanship with contemporary style for an elevated grooming experience.</p>
-
-                </div>
-
                 <div class="features-grid">
+
+
+                    <!-- FEATURE 1 -->
 
                     <div class="feature-card">
 
@@ -474,11 +559,22 @@
 
                         </div>
 
-                        <h3>Precision Craft</h3>
 
-                        <p>Every cut and fade is tailored to your head shape, hair texture, and personal preference.</p>
+                        <h3>
+                            Precision Craft
+                        </h3>
+
+
+                        <p>
+                            Every cut and fade is tailored to your head
+                            shape, hair texture, and personal preference.
+                        </p>
 
                     </div>
+
+
+
+                    <!-- FEATURE 2 -->
 
                     <div class="feature-card">
 
@@ -488,11 +584,23 @@
 
                         </div>
 
-                        <h3>Zero Wait Times</h3>
 
-                        <p>Book directly online with your preferred barber. We respect your schedule with punctual chairs.</p>
+                        <h3>
+                            Easy Online Booking
+                        </h3>
+
+
+                        <p>
+                            Choose your service, preferred barber, date,
+                            and available appointment time directly
+                            through our online booking system.
+                        </p>
 
                     </div>
+
+
+
+                    <!-- FEATURE 3 -->
 
                     <div class="feature-card">
 
@@ -502,11 +610,22 @@
 
                         </div>
 
-                        <h3>Premium Products</h3>
 
-                        <p>We only use curated pomades, oils, tonics, and hot lather designed for clean results.</p>
+                        <h3>
+                            Premium Products
+                        </h3>
+
+
+                        <p>
+                            We use grooming products selected to support
+                            clean styling and professional results.
+                        </p>
 
                     </div>
+
+
+
+                    <!-- FEATURE 4 -->
 
                     <div class="feature-card">
 
@@ -516,11 +635,19 @@
 
                         </div>
 
-                        <h3>Welcoming Space</h3>
 
-                        <p>Enjoy a relaxed atmosphere with great music, complimentary cold beverages, and respectful service.</p>
+                        <h3>
+                            Welcoming Space
+                        </h3>
+
+
+                        <p>
+                            Enjoy a relaxed atmosphere designed to make
+                            your visit comfortable and enjoyable.
+                        </p>
 
                     </div>
+
 
                 </div>
 
@@ -529,63 +656,40 @@
         </section>
 
 
-        <!-- ================= TESTIMONIALS ================= -->
+
+        <!-- ================= CLIENT FEEDBACK ================= -->
 
         <section class="testimonials section">
 
             <div class="container">
 
+
                 <div class="section-heading centered">
 
-                    <span class="demo-disclaimer">Sample Client Reviews</span>
+                    <span class="eyebrow">
+                        CLIENT FEEDBACK
+                    </span>
 
-                    <span class="eyebrow">REPUTATION & REVIEWS</span>
 
-                    <h2>What Our Clients <span>Say About Us.</span></h2>
+                    <h2>
+                        Your Experience
+                        <span>Matters.</span>
+                    </h2>
 
-                    <p>Real confidence delivered chair after chair. Replaceable with genuine reviews as your shop grows.</p>
+
+                    <p>
+                        We're building our client experience one appointment
+                        at a time. Genuine customer feedback will be featured
+                        here as reviews come in.
+                    </p>
 
                 </div>
 
+
                 <div class="testimonials-grid">
 
-                    <div class="testimonial-card">
 
-                        <div>
-
-                            <div class="testimonial-stars">
-
-                                <i class="fa-solid fa-star"></i>
-
-                                <i class="fa-solid fa-star"></i>
-
-                                <i class="fa-solid fa-star"></i>
-
-                                <i class="fa-solid fa-star"></i>
-
-                                <i class="fa-solid fa-star"></i>
-
-                            </div>
-
-                            <p>"The attention to detail here is on another level. Mark understood exactly what fade worked with my hairline. Hands down the best barbershop in Biñan."</p>
-
-                        </div>
-
-                        <div class="testimonial-author">
-
-                            <div class="author-avatar">MC</div>
-
-                            <div class="author-info">
-
-                                <h4>Miguel Cruz</h4>
-
-                                <span>Regular Client</span>
-
-                            </div>
-
-                        </div>
-
-                    </div>
+                    <!-- FEEDBACK PLACEHOLDER 1 -->
 
                     <div class="testimonial-card">
 
@@ -593,37 +697,51 @@
 
                             <div class="testimonial-stars">
 
-                                <i class="fa-solid fa-star"></i>
-
-                                <i class="fa-solid fa-star"></i>
-
-                                <i class="fa-solid fa-star"></i>
-
-                                <i class="fa-solid fa-star"></i>
-
-                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
 
                             </div>
 
-                            <p>"Booking through their website was super easy—picked my barber, selected the slot, and showed up without waiting 45 minutes in line. Precision cut every time."</p>
+
+                            <p>
+                                Customer reviews will appear here once
+                                genuine feedback has been collected.
+                            </p>
 
                         </div>
 
+
                         <div class="testimonial-author">
 
-                            <div class="author-avatar">DR</div>
+                            <div class="author-avatar">
+
+                                <i class="fa-solid fa-user"></i>
+
+                            </div>
+
 
                             <div class="author-info">
 
-                                <h4>Dave Ramirez</h4>
+                                <h4>
+                                    Future Client Review
+                                </h4>
 
-                                <span>Verified Booking</span>
+                                <span>
+                                    Genuine feedback coming soon
+                                </span>
 
                             </div>
 
                         </div>
 
                     </div>
+
+
+
+                    <!-- FEEDBACK PLACEHOLDER 2 -->
 
                     <div class="testimonial-card">
 
@@ -631,43 +749,109 @@
 
                             <div class="testimonial-stars">
 
-                                <i class="fa-solid fa-star"></i>
-
-                                <i class="fa-solid fa-star"></i>
-
-                                <i class="fa-solid fa-star"></i>
-
-                                <i class="fa-solid fa-star"></i>
-
-                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
 
                             </div>
 
-                            <p>"Top tier beard trimming and fade combo. Alex is an artist with clippers and straight razors. Clean shop, great vibe, professional atmosphere."</p>
+
+                            <p>
+                                This section is ready for verified feedback
+                                from customers who have visited Yankiii
+                                Barber Co.
+                            </p>
 
                         </div>
 
+
                         <div class="testimonial-author">
 
-                            <div class="author-avatar">JT</div>
+                            <div class="author-avatar">
+
+                                <i class="fa-solid fa-user"></i>
+
+                            </div>
+
 
                             <div class="author-info">
 
-                                <h4>Jared Tan</h4>
+                                <h4>
+                                    Future Client Review
+                                </h4>
 
-                                <span>Monthly Member</span>
+                                <span>
+                                    Genuine feedback coming soon
+                                </span>
 
                             </div>
 
                         </div>
 
                     </div>
+
+
+
+                    <!-- FEEDBACK PLACEHOLDER 3 -->
+
+                    <div class="testimonial-card">
+
+                        <div>
+
+                            <div class="testimonial-stars">
+
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+
+                            </div>
+
+
+                            <p>
+                                Verified customer experiences can be
+                                displayed here as the shop begins
+                                collecting reviews.
+                            </p>
+
+                        </div>
+
+
+                        <div class="testimonial-author">
+
+                            <div class="author-avatar">
+
+                                <i class="fa-solid fa-user"></i>
+
+                            </div>
+
+
+                            <div class="author-info">
+
+                                <h4>
+                                    Future Client Review
+                                </h4>
+
+                                <span>
+                                    Genuine feedback coming soon
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
 
                 </div>
 
             </div>
 
         </section>
+
 
 
         <!-- ================= CTA ================= -->
@@ -676,37 +860,39 @@
 
             <div class="container cta-container">
 
+
                 <div>
 
                     <span class="eyebrow">
-
                         READY WHEN YOU ARE
-
                     </span>
 
+
                     <h2>
-
                         Your next cut
-
                         <span>starts here.</span>
-
                     </h2>
 
                 </div>
 
-                <a href="booking.html" class="btn btn-light">
 
+                <a
+                    href="booking.html"
+                    class="btn btn-light"
+                    onclick="return requireBookingLogin(event)"
+                >
                     Book Your Appointment
-
                     <i class="fa-solid fa-arrow-right"></i>
-
                 </a>
+
 
             </div>
 
         </section>
 
+
     </main>
+
 
 
     <!-- ================= FOOTER ================= -->
@@ -715,28 +901,49 @@
 
         <div class="container footer-grid">
 
+
+            <!-- BRAND -->
+
             <div class="footer-brand">
 
-        <a href="index.html" class="logo">
-            <img src="assets\logo\logo.png" alt="Yankiii Barber Co.">
-        </a>
+                <a href="index.html" class="logo">
+
+                    <img
+                        src="assets/logo/logo.png"
+                        alt="Yankiii Barber Co."
+                    >
+
+                </a>
+
 
                 <p>
                     Precision cuts. Personal style.
                     Your standard.
                 </p>
 
+
                 <div class="social-links">
 
-                    <a href="#">
+                    <a
+                        href="#"
+                        aria-label="Facebook"
+                    >
                         <i class="fa-brands fa-facebook-f"></i>
                     </a>
 
-                    <a href="#">
+
+                    <a
+                        href="#"
+                        aria-label="Instagram"
+                    >
                         <i class="fa-brands fa-instagram"></i>
                     </a>
 
-                    <a href="#">
+
+                    <a
+                        href="#"
+                        aria-label="TikTok"
+                    >
                         <i class="fa-brands fa-tiktok"></i>
                     </a>
 
@@ -745,38 +952,81 @@
             </div>
 
 
+
+            <!-- NAVIGATION -->
+
             <div class="footer-column">
 
-                <h4>Navigation</h4>
+                <h4>
+                    Navigation
+                </h4>
 
-                <a href="index.html">Home</a>
-                <a href="services.html">Services</a>
-                <a href="barbers.html">Barbers</a>
-                <a href="about.html">About</a>
+                <a href="index.html">
+                    Home
+                </a>
+
+                <a href="services.html">
+                    Services
+                </a>
+
+                <a href="barbers.html">
+                    Barbers
+                </a>
+
+                <a href="about.html">
+                    About
+                </a>
+
+                <a href="contact.html">
+                    Contact
+                </a>
 
             </div>
 
 
+
+            <!-- SERVICES -->
+
             <div class="footer-column">
 
-                <h4>Services</h4>
+                <h4>
+                    Services
+                </h4>
 
-                <a href="services.html">Classic Haircut</a>
-                <a href="services.html">Signature Fade</a>
-                <a href="services.html">Hair & Beard</a>
-                <a href="services.html">Full Grooming</a>
+                <a href="services.html">
+                    Classic Haircut
+                </a>
+
+                <a href="services.html">
+                    Signature Fade
+                </a>
+
+                <a href="services.html">
+                    Hair &amp; Beard
+                </a>
+
+                <a href="services.html">
+                    Full Grooming
+                </a>
 
             </div>
 
 
+
+            <!-- VISIT US -->
+
             <div class="footer-column">
 
-                <h4>Visit Us</h4>
+                <h4>
+                    Visit Us
+                </h4>
+
 
                 <p>
                     Your Location<br>
                     Biñan, Laguna
                 </p>
+
 
                 <p>
                     Mon – Sun<br>
@@ -785,8 +1035,12 @@
 
             </div>
 
+
         </div>
 
+
+
+        <!-- FOOTER BOTTOM -->
 
         <div class="footer-bottom">
 
@@ -797,8 +1051,9 @@
                     All rights reserved.
                 </p>
 
+
                 <p>
-                    Designed & Developed by Khian
+                    Designed &amp; Developed by Khian
                 </p>
 
             </div>
@@ -808,10 +1063,19 @@
     </footer>
 
 
+
+    <!-- ================= SCRIPTS ================= -->
+
     <script src="js/api.js"></script>
+
     <script src="js/main.js"></script>
+
     <script src="js/booking-guard.js"></script>
 
+    <script src="js/home-barbers.js"></script>
+
+
+    <script src="/js/cookie-consent.js"></script>
 </body>
 
 </html>

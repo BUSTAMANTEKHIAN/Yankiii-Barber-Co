@@ -55,13 +55,13 @@ const pool = mysql.createPool(poolConfig);
     try {
         const connection = await pool.getConnection();
 
-        console.log(
-            `✅ MySQL/TiDB Connected to database [${process.env.DB_NAME || 'yankiii_barber'}] successfully.`
-        );
+        if (process.env.NODE_ENV === 'production') console.log('Database connection established.');
+        else console.log(`✅ MySQL/TiDB Connected to database [${process.env.DB_NAME || 'yankiii_barber'}] successfully.`);
 
         connection.release();
     } catch (err) {
-        console.warn('⚠️ Database Connection Notice:', err.message);
+        if (process.env.NODE_ENV === 'production') console.warn('Database connection is unavailable.');
+        else console.warn('⚠️ Database Connection Notice:', err.message);
         console.warn(
             '   The server will start, but database operations may fail until the database connection is available.'
         );

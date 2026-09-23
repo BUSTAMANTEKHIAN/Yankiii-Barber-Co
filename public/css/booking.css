@@ -492,3 +492,73 @@
     }
 }
 
+/* ================= INTERACTIVE-CARD RESETS ================= */
+/*
+ * These cards are rendered as <button> elements, so strip
+ * native button styling that would otherwise fight the
+ * classes above (text alignment, default appearance, etc).
+ */
+.service-select-item,
+.barber-select-item,
+.date-chip-btn,
+.slot-btn {
+    font-family: inherit;
+    text-align: left;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.service-select-item,
+.barber-select-item,
+.slot-btn {
+    width: 100%;
+}
+
+.slot-btn,
+.date-chip-btn {
+    text-align: center;
+}
+
+/* ================= FOCUS-VISIBLE STATES (KEYBOARD A11Y) ================= */
+.service-select-item:focus-visible,
+.barber-select-item:focus-visible,
+.date-chip-btn:focus-visible,
+.slot-btn:focus-visible,
+.step-node:focus-visible .step-circle {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* ================= LOCKED / UPCOMING STEP CUE ================= */
+/*
+ * A step the user hasn't unlocked yet (not active, not
+ * completed) reads as slightly dimmed so the flow feels
+ * guided rather than fully free-roaming.
+ */
+.step-node:not(.active):not(.completed) .step-circle {
+    opacity: 0.55;
+}
+
+.step-node:not(.active):not(.completed):hover .step-circle {
+    opacity: 0.8;
+}
+
+/* ================= EMPTY / ERROR STATE ICON ================= */
+.api-state i {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 20px;
+}
+
+/* ================= SUBTLE MICRO-INTERACTIONS ================= */
+.service-select-item,
+.barber-select-item {
+    transform: translateZ(0);
+}
+
+.service-select-item:active,
+.barber-select-item:active,
+.slot-btn:active:not(:disabled),
+.date-chip-btn:active {
+    transform: scale(0.98);
+}

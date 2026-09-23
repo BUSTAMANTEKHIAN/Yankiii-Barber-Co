@@ -11,29 +11,38 @@ const { sendMail } = require('../config/mailer');
 const { JWT_SECRET } = require('../middleware/authMiddleware');
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const strongPassword = value => typeof value === 'string' && value.length >= 8 && value.length <= 128 && /[a-z]/.test(value) && /[A-Z]/.test(value) && /\d/.test(value);
+const normalizePhone = value => {
+    if (value == null || value === '') return null;
+    if (typeof value !== 'string') return undefined;
+    const compact = value.trim().replace(/[\s()-]/g, '');
+    const normalized = compact.startsWith('+63') ? `0${compact.slice(3)}` : compact;
+    return /^09\d{9}$/.test(normalized) ? normalized : undefined;
+};
+const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 
 async function register(req, res) {
     try {
         const { name, email, phone, password } = req.body;
 
-        if (!name || !email || !password) {
+        if (typeof name !== 'string' || typeof email !== 'string' || typeof password !== 'string' || !name.trim() || !email.trim() || !password) {
             return res.status(400).json({
                 success: false,
                 message: 'Name, email, and password are required.'
             });
         }
 
-        if (!emailRegex.test(email)) {
+        if (name.trim().length > 100 || email.trim().length > 150 || !emailRegex.test(email.trim())) {
             return res.status(400).json({
                 success: false,
                 message: 'Please provide a valid email address.'
             });
         }
 
-        if (password.length < 6) {
+        if (!strongPassword(password)) {
             return res.status(400).json({
                 success: false,
-                message: 'Password must be at least 6 characters long.'
+                message: 'Use 8 to 128 characters, including uppercase, lowercase, and a number.'
             });
         }
 
@@ -47,13 +56,14 @@ async function register(req, res) {
         }
 
         // Hash password
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
+        const normalizedPhone = normalizePhone(phone);
+        if (normalizedPhone === undefined) return res.status(400).json({ success: false, message: 'Please enter a valid Philippine mobile number.' });
+        const hashedPassword = await bcrypt.hash(password, 12);
 
         // Insert new user
         const [result] = await pool.query(
             'INSERT INTO users (name, email, password, phone, role) VALUES (?, ?, ?, ?, ?)',
-            [name.trim(), email.toLowerCase().trim(), hashedPassword, phone ? phone.trim() : null, 'customer']
+            [name.trim(), email.toLowerCase().trim(), hashedPassword, normalizedPhone, 'customer']
         );
 
         const newUserId = result.insertId;
@@ -61,7 +71,7 @@ async function register(req, res) {
             id: newUserId,
             name: name.trim(),
             email: email.toLowerCase().trim(),
-            phone: phone || null,
+            phone: normalizedPhone,
             role: 'customer'
         };
 
@@ -184,23 +194,25 @@ async function updateProfile(req, res) {
         const updates = [];
         const params = [];
 
-        if (name) {
+        if (name !== undefined) {
+            if (typeof name !== 'string' || name.trim().length < 2 || name.trim().length > 100) return res.status(400).json({ success: false, message: 'Name must be between 2 and 100 characters.' });
             updates.push('name = ?');
             params.push(name.trim());
         }
         if (phone !== undefined) {
+            const normalizedPhone = normalizePhone(phone);
+            if (normalizedPhone === undefined) return res.status(400).json({ success: false, message: 'Please enter a valid Philippine mobile number.' });
             updates.push('phone = ?');
-            params.push(phone.trim());
+            params.push(normalizedPhone);
         }
         if (password) {
-            if (password.length < 6) {
+            if (!strongPassword(password)) {
                 return res.status(400).json({
                     success: false,
-                    message: 'Password must be at least 6 characters.'
+                    message: 'Use 8 to 128 characters, including uppercase, lowercase, and a number.'
                 });
             }
-            const salt = await bcrypt.genSalt(10);
-            const hashed = await bcrypt.hash(password, salt);
+            const hashed = await bcrypt.hash(password, 12);
             updates.push('password = ?');
             params.push(hashed);
         }
@@ -232,7 +244,7 @@ async function forgotPassword(req, res) {
     try {
         const { email } = req.body;
 
-        if (!email || !email.trim()) {
+        if (typeof email !== 'string' || !email.trim() || email.length > 150 || !emailRegex.test(email.trim())) {
             return res.status(400).json({
                 success: false,
                 message: 'Email address is required.'
@@ -312,7 +324,7 @@ async function forgotPassword(req, res) {
                 ">
                     <h2>Yankiii Barber Co.</h2>
 
-                    <p>Hello ${user.name || 'there'},</p>
+                    <p>Hello ${escapeHtml(user.name || 'there')},</p>
 
                     <p>
                         We received a request to reset your password.
@@ -508,10 +520,10 @@ async function resetPassword(req, res) {
             });
         }
 
-        if (newPassword.length < 6) {
+        if (!strongPassword(newPassword)) {
             return res.status(400).json({
                 success: false,
-                message: 'Password must be at least 6 characters long.'
+                message: 'Use 8 to 128 characters, including uppercase, lowercase, and a number.'
             });
         }
 
@@ -605,4 +617,3 @@ module.exports = {
     verifyResetCode,
     resetPassword
 };
-

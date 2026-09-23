@@ -1,15 +1,31 @@
 /**
- * Yankiii Barber Co. — Booking Wizard Engine
- * Coordinates service/barber selection, dynamic availability calculation,
- * slot selection, logged-in user prefilling, and reservation confirmation.
+ * Yankiii Barber Co. — Booking Script
+ *
+ * Handles:
+ * - Authentication protection
+ * - Service loading
+ * - Barber loading
+ * - Any Available Barber
+ * - Date selection
+ * - Real-time availability
+ * - Time-slot selection
+ * - Logged-in customer prefilling
+ * - Booking summary
+ * - Booking submission
+ * - Booking confirmation redirect
  */
 
+'use strict';
+
+/* =========================================================
+   BOOKING STATE
+========================================================= */
+
 const bookingState = {
-    step: 1,
-    service: null,   // { id, name, price, duration }
-    barber: null,    // { id, name, specialty }
-    date: '',        // YYYY-MM-DD
-    time: '',        // HH:mm
+    service: null,
+    barber: null,
+    date: '',
+    time: '',
     customer: {
         name: '',
         email: '',
@@ -18,438 +34,2720 @@ const bookingState = {
     }
 };
 
+/*
+ * Prevent an older availability request from
+ * overwriting a newer request.
+ */
+let availabilityRequestId = 0;
+
+/*
+ * Tracks which wizard step is currently shown,
+ * used to decide which step circles are clickable.
+ */
+let currentStep = 1;
+
+
+/* =========================================================
+   PAGE INITIALIZATION
+========================================================= */
+
 document.addEventListener('DOMContentLoaded', async () => {
-    initDatePicker();
+
+    const token =
+        localStorage.getItem('ybc_token');
+
+    const user =
+        localStorage.getItem('ybc_user');
+
+    /*
+     * booking-guard.js already protects the page.
+     * This is an additional safety check.
+     */
+    if (!token || !user) {
+        return;
+    }
+
+    setMinimumDate();
+    buildQuickDateChips();
+    resetTimeSlots();
+
     await loadServices();
     await loadBarbers();
-    checkUrlParams();
+
     prefillLoggedInUser();
+
+    setupEventListeners();
+
     updateSummary();
+
+    updateStepUI();
+
+    /*
+     * Initialize the progress bar fill without
+     * triggering goToStep's scroll-to-top on load.
+     */
+    const progressFill =
+        document.getElementById('stepProgressFill');
+
+    if (progressFill) {
+        progressFill.style.width = '0%';
+    }
+
 });
 
-// Setup date input restrictions and quick date chips
-function initDatePicker() {
-    const dateInput = document.getElementById('bookingDateInput');
-    const chipsContainer = document.getElementById('quickDateChips');
-    if (!dateInput) return;
 
-    const today = new Date();
-    const pad = (n) => String(n).padStart(2, '0');
-    const formatDate = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+/* =========================================================
+   DATE SETUP
+========================================================= */
 
-    const minDateStr = formatDate(today);
-    dateInput.min = minDateStr;
-    dateInput.value = minDateStr;
-    bookingState.date = minDateStr;
+function setMinimumDate() {
 
-    // Quick chips: Today, Tomorrow, Day After
-    const days = [
-        { label: 'Today', date: new Date(today) },
-        { label: 'Tomorrow', date: new Date(today.getTime() + 86400000) },
-        { label: 'In 2 Days', date: new Date(today.getTime() + 172800000) }
-    ];
+    const dateInput =
+        document.getElementById('bookingDateInput');
 
-    if (chipsContainer) {
-        chipsContainer.innerHTML = days.map((d, index) => {
-            const dateStr = formatDate(d.date);
-            const activeClass = index === 0 ? 'active' : '';
-            return `
-                <button type="button" class="date-chip-btn ${activeClass}" data-date="${dateStr}">
-                    ${d.label} (${d.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})
-                </button>
-            `;
-        }).join('');
-
-        chipsContainer.querySelectorAll('.date-chip-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                chipsContainer.querySelectorAll('.date-chip-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                dateInput.value = btn.dataset.date;
-                bookingState.date = btn.dataset.date;
-                updateSummary();
-                fetchAvailability();
-            });
-        });
-    }
-
-    dateInput.addEventListener('change', () => {
-        bookingState.date = dateInput.value;
-        if (chipsContainer) {
-            chipsContainer.querySelectorAll('.date-chip-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.date === dateInput.value);
-            });
-        }
-        updateSummary();
-        fetchAvailability();
-    });
-}
-
-// Prefill user data if logged in
-function prefillLoggedInUser() {
-    const user = window.api ? window.api.getUser() : null;
-    if (user) {
-        const nameField = document.getElementById('custName');
-        const emailField = document.getElementById('custEmail');
-        const phoneField = document.getElementById('custPhone');
-        if (nameField && user.name) nameField.value = user.name;
-        if (emailField && user.email) emailField.value = user.email;
-        if (phoneField && user.phone) phoneField.value = user.phone;
-    }
-}
-
-// Check URL query parameters for pre-selected service or barber
-function checkUrlParams() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const serviceId = urlParams.get('service_id');
-    const barberId = urlParams.get('barber_id');
-
-    if (serviceId) {
-        const serviceItem = document.querySelector(`.service-select-item[data-id="${serviceId}"]`);
-        if (serviceItem) {
-            selectServiceItem(serviceItem);
-        }
-    }
-
-    if (barberId) {
-        const barberItem = document.querySelector(`.barber-select-item[data-id="${barberId}"]`);
-        if (barberItem) {
-            selectBarberItem(barberItem);
-        }
-    }
-}
-
-// Load dynamic services from backend or attach events to existing markup
-async function loadServices() {
-    const list = document.getElementById('serviceOptionsList');
-    if (!list) return;
-
-    try {
-        const res = await window.api.get('/services');
-        if (res.success && Array.isArray(res.data)) {
-            const active = res.data.filter(s => s.status === 'active' || s.status === 1);
-            list.innerHTML = active.length ? active.map(s => `
-                    <div class="service-select-item" data-id="${s.id}" data-name="${window.escapeHtml(s.name)}" data-price="${Number(s.price)}" data-duration="${Number(s.duration)}">
-                        <div class="service-item-info">
-                            <h4>${window.escapeHtml(s.name)}</h4>
-                            <p>${window.escapeHtml(s.description || 'Tailored grooming treatment.')}</p>
-                        </div>
-                        <div class="service-item-meta">
-                            <span class="price">₱${Number(s.price).toLocaleString()}</span>
-                            <span class="duration"><i class="fa-regular fa-clock"></i> ${s.duration} min</span>
-                        </div>
-                    </div>
-                `).join('') : '<p class="api-state">No services are currently available.</p>';
-        } else {
-            list.innerHTML = `<p class="api-state api-state-error">${window.escapeHtml(res.message || 'We couldn’t load services. Please refresh.')}</p>`;
-        }
-    } catch (e) {
-        list.innerHTML = '<p class="api-state api-state-error">We couldn’t load services. Please refresh.</p>';
-    }
-
-    list.querySelectorAll('.service-select-item').forEach(item => {
-        item.addEventListener('click', () => selectServiceItem(item));
-    });
-}
-
-function selectServiceItem(item) {
-    document.querySelectorAll('.service-select-item').forEach(el => el.classList.remove('selected'));
-    item.classList.add('selected');
-
-    bookingState.service = {
-        id: item.dataset.id,
-        name: item.dataset.name,
-        price: Number(item.dataset.price),
-        duration: Number(item.dataset.duration)
-    };
-
-    document.getElementById('step1NextBtn').disabled = false;
-    updateSummary();
-
-    // If date and barber are already selected, refresh slots
-    if (bookingState.barber && bookingState.date) {
-        fetchAvailability();
-    }
-}
-
-// Load dynamic barbers from backend or attach events to existing markup
-async function loadBarbers() {
-    const list = document.getElementById('barberOptionsList');
-    if (!list) return;
-
-    try {
-        const res = await window.api.get('/barbers');
-        if (res.success && Array.isArray(res.data)) {
-            const active = res.data.filter(b => b.status === 'active' || b.status === 1);
-            list.innerHTML = active.length ? active.map(b => {
-                    const img = b.image || `assets/images/barber-${b.id}.jpg`;
-                    return `
-                        <div class="barber-select-item" data-id="${b.id}" data-name="${window.escapeHtml(b.name)}" data-specialty="${window.escapeHtml(b.specialty || 'Barber Specialist')}">
-                            <div class="barber-avatar-sm">
-                                <img src="${window.escapeHtml(img)}" alt="${window.escapeHtml(b.name)}">
-                            </div>
-                            <div class="barber-select-text">
-                                <h4>${window.escapeHtml(b.name)}</h4>
-                                <span>${window.escapeHtml(b.specialty || 'Barber Specialist')}</span>
-                            </div>
-                        </div>
-                    `;
-                }).join('') : '<p class="api-state">No barbers are currently available.</p>';
-        } else {
-            list.innerHTML = `<p class="api-state api-state-error">${window.escapeHtml(res.message || 'We couldn’t load barbers. Please refresh.')}</p>`;
-        }
-    } catch (e) {
-        list.innerHTML = '<p class="api-state api-state-error">We couldn’t load barbers. Please refresh.</p>';
-    }
-
-    list.querySelectorAll('.barber-select-item').forEach(item => {
-        item.addEventListener('click', () => selectBarberItem(item));
-    });
-}
-
-function selectBarberItem(item) {
-    document.querySelectorAll('.barber-select-item').forEach(el => el.classList.remove('selected'));
-    item.classList.add('selected');
-
-    bookingState.barber = {
-        id: item.dataset.id,
-        name: item.dataset.name,
-        specialty: item.dataset.specialty
-    };
-
-    document.getElementById('step2NextBtn').disabled = false;
-    updateSummary();
-
-    if (bookingState.service && bookingState.date) {
-        fetchAvailability();
-    }
-}
-
-// Fetch availability from the booking engine. Slots are always server-derived.
-async function fetchAvailability() {
-    const grid = document.getElementById('slotsGrid');
-    const note = document.getElementById('slotDurationNote');
-    const loading = document.getElementById('slotsLoadingMsg');
-    const nextBtn = document.getElementById('step3NextBtn');
-    if (!grid) return;
-
-    if (!bookingState.barber || !bookingState.date || !bookingState.service) {
-        grid.innerHTML = '<p style="color: #65705f; grid-column: 1/-1; padding: 20px 0;">Please select a service and barber first.</p>';
+    if (!dateInput) {
         return;
     }
 
-    if (note) {
-        note.textContent = `Service duration: ${bookingState.service.duration} mins`;
-    }
-
-    if (loading) loading.style.display = 'block';
-    grid.innerHTML = '';
-    if (nextBtn) nextBtn.disabled = !bookingState.time;
-
-    try {
-        const query = `/bookings/availability?barber_id=${bookingState.barber.id}&service_id=${bookingState.service.id}&date=${bookingState.date}`;
-        const res = await window.api.get(query);
-
-        if (loading) loading.style.display = 'none';
-
-        if (res.success && Array.isArray(res.data.slots)) {
-            renderSlots(res.data.slots);
-            return;
-        }
-    } catch (err) {
-        // api.request returns a safe result, but retain this guard for unexpected errors.
-    }
-
-    if (loading) loading.style.display = 'none';
-    grid.innerHTML = '<p class="api-state api-state-error">We couldn’t check availability. Please try again.</p>';
+    dateInput.min =
+        toDateString(new Date());
 }
 
-// Render dynamic slots from API response
-function renderSlots(slots) {
-    const grid = document.getElementById('slotsGrid');
-    if (!grid) return;
 
-    if (slots.length === 0) {
-        grid.innerHTML = `
-            <div style="grid-column: 1/-1; text-align: center; padding: 30px; color: #879382;">
-                <i class="fa-regular fa-calendar-xmark" style="font-size: 30px; margin-bottom: 8px;"></i>
-                <p>No available slots for this date. The barber may be off or fully booked. Please try another day.</p>
+/*
+ * Formats a Date object as a local YYYY-MM-DD string,
+ * matching what a <input type="date"> expects/returns.
+ */
+function toDateString(date) {
+
+    const year =
+        date.getFullYear();
+
+    const month =
+        String(date.getMonth() + 1)
+            .padStart(2, '0');
+
+    const day =
+        String(date.getDate())
+            .padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+
+}
+
+
+/* =========================================================
+   QUICK DATE CHIPS
+========================================================= */
+
+function buildQuickDateChips() {
+
+    const container =
+        document.getElementById(
+            'quickDateChips'
+        );
+
+    if (!container) {
+        return;
+    }
+
+    container.innerHTML = '';
+
+    const today =
+        new Date();
+
+    const dayCount = 7;
+
+    for (let i = 0; i < dayCount; i++) {
+
+        const date =
+            new Date(today);
+
+        date.setDate(
+            today.getDate() + i
+        );
+
+        const dateString =
+            toDateString(date);
+
+        let label;
+
+        if (i === 0) {
+            label = 'Today';
+        } else if (i === 1) {
+            label = 'Tomorrow';
+        } else {
+            label = date.toLocaleDateString(
+                'en-US',
+                {
+                    weekday: 'short',
+                    day: 'numeric'
+                }
+            );
+        }
+
+        const chip =
+            document.createElement('button');
+
+        chip.type = 'button';
+        chip.className = 'date-chip-btn';
+        chip.dataset.date = dateString;
+        chip.textContent = label;
+
+        chip.addEventListener(
+            'click',
+            () => {
+                applySelectedDate(dateString);
+            }
+        );
+
+        container.appendChild(chip);
+
+    }
+
+}
+
+
+function syncQuickDateChips(dateString) {
+
+    document
+        .querySelectorAll('.date-chip-btn')
+        .forEach(chip => {
+
+            chip.classList.toggle(
+                'active',
+                chip.dataset.date === dateString
+            );
+
+        });
+
+}
+
+
+/*
+ * Single source of truth for "the user picked a date",
+ * whether that came from a quick chip or the native
+ * date input.
+ */
+function applySelectedDate(dateString) {
+
+    const dateInput =
+        document.getElementById('bookingDateInput');
+
+    if (dateInput) {
+        dateInput.value = dateString;
+    }
+
+    bookingState.date = dateString;
+    bookingState.time = '';
+
+    syncQuickDateChips(dateString);
+
+    resetTimeSlots();
+    updateSummary();
+
+    if (
+        bookingState.service &&
+        bookingState.barber &&
+        bookingState.date
+    ) {
+        fetchAvailability();
+    }
+
+    updateStepUI();
+
+}
+
+
+/* =========================================================
+   EVENT LISTENERS
+========================================================= */
+
+function setupEventListeners() {
+
+    const dateInput =
+        document.getElementById('bookingDateInput');
+
+    const paymentSelect =
+        document.getElementById('paymentMethod');
+
+    const bookingForm =
+        document.getElementById('bookingForm');
+
+    /*
+     * DATE
+     */
+    if (dateInput) {
+
+        dateInput.addEventListener('change', () => {
+
+            applySelectedDate(
+                dateInput.value
+            );
+
+        });
+
+    }
+
+
+    /*
+     * PAYMENT
+     */
+    if (paymentSelect) {
+
+        paymentSelect.addEventListener(
+            'change',
+            updateSummary
+        );
+
+    }
+
+
+    /*
+     * FORM SUBMISSION
+     */
+    if (bookingForm) {
+
+        bookingForm.addEventListener(
+            'submit',
+            handleBookingSubmit
+        );
+
+    }
+
+
+    /*
+     * STEP BUTTONS
+     */
+
+    const step1Next =
+        document.getElementById('step1NextBtn');
+
+    const step2Back =
+        document.getElementById('step2BackBtn');
+
+    const step2Next =
+        document.getElementById('step2NextBtn');
+
+    const step3Back =
+        document.getElementById('step3BackBtn');
+
+    const step3Next =
+        document.getElementById('step3NextBtn');
+
+    if (step1Next) {
+
+        step1Next.addEventListener(
+            'click',
+            handleStep1Next
+        );
+
+    }
+
+    if (step2Back) {
+
+        step2Back.addEventListener(
+            'click',
+            () => {
+                goToStep(1);
+            }
+        );
+
+    }
+
+    if (step2Next) {
+
+        step2Next.addEventListener(
+            'click',
+            handleStep2Next
+        );
+
+    }
+
+    if (step3Back) {
+
+        step3Back.addEventListener(
+            'click',
+            () => {
+                goToStep(2);
+            }
+        );
+
+    }
+
+    if (step3Next) {
+
+        step3Next.addEventListener(
+            'click',
+            handleStep3Next
+        );
+
+    }
+
+
+    /*
+     * CLICK-OUTSIDE MODAL
+     */
+
+    const bookingModal =
+        document.getElementById('bookingModal');
+
+    if (bookingModal) {
+
+        bookingModal.addEventListener(
+            'click',
+            event => {
+
+                if (
+                    event.target ===
+                    bookingModal
+                ) {
+
+                    closeBookingModal();
+
+                }
+
+            }
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   LOAD SERVICES
+========================================================= */
+
+async function loadServices() {
+
+    const serviceList =
+        document.getElementById(
+            'serviceOptionsList'
+        );
+
+    if (!serviceList) {
+        return;
+    }
+
+    try {
+
+        serviceList.innerHTML = `
+            <div class="api-state">
+                Loading services...
             </div>
         `;
-        return;
-    }
 
-    grid.innerHTML = slots.map(slot => {
-        const isSelected = bookingState.time === slot.time;
-        const disabledAttr = !slot.available ? 'disabled' : '';
-        const selectedClass = isSelected ? 'selected' : '';
-        return `
-            <button type="button" class="slot-btn ${selectedClass}" data-time="${slot.time}" ${disabledAttr}>
-                <span>${formatTimeLabel(slot.time)}</span>
-            </button>
-        `;
-    }).join('');
+        const response =
+            await window.api.get('/services');
 
-    attachSlotClickListeners();
-}
+        if (
+            !response.success ||
+            !Array.isArray(response.data)
+        ) {
 
-function attachSlotClickListeners() {
-    document.querySelectorAll('.slot-btn:not(:disabled)').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-            bookingState.time = btn.dataset.time;
-            document.getElementById('step3NextBtn').disabled = false;
-            updateSummary();
+            serviceList.innerHTML = `
+                <div class="api-state api-state-error">
+                    Unable to load services.
+                </div>
+            `;
+
+            return;
+        }
+
+        const activeServices =
+            response.data.filter(
+                service =>
+                    service.status === 'active' ||
+                    service.status === 1
+            );
+
+        window.yankiiiServices = activeServices;
+
+        if (
+            activeServices.length === 0
+        ) {
+
+            serviceList.innerHTML = `
+                <div class="api-state">
+                    No services are currently available.
+                </div>
+            `;
+
+            return;
+        }
+
+        serviceList.innerHTML = '';
+
+        activeServices.forEach(service => {
+
+            const card =
+                document.createElement('button');
+
+            card.type = 'button';
+
+            card.className =
+                'service-select-item';
+
+            card.dataset.serviceId =
+                String(service.id);
+
+            const price =
+                Number(service.price || 0)
+                    .toLocaleString(
+                        'en-PH',
+                        {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        }
+                    );
+
+            const duration =
+                Number(service.duration || 30);
+
+            const description =
+                service.description
+                    ? `<p>${escapeHtml(service.description)}</p>`
+                    : '';
+
+            card.innerHTML = `
+                <span class="service-item-info">
+                    <h4>${escapeHtml(service.name)}</h4>
+                    ${description}
+                </span>
+
+                <span class="service-item-meta">
+                    <span class="price">₱${price}</span>
+                    <span class="duration">${duration} min</span>
+                </span>
+            `;
+
+            card.addEventListener(
+                'click',
+                () => {
+
+                    selectService(service);
+
+                }
+            );
+
+            serviceList.appendChild(card);
+
         });
-    });
+
+    } catch (error) {
+
+        console.error(
+            'Service loading error:',
+            error
+        );
+
+        serviceList.innerHTML = `
+            <div class="api-state api-state-error">
+                Unable to load services.
+                Please refresh and try again.
+            </div>
+        `;
+
+    }
+
 }
 
-function formatTimeLabel(timeStr) {
-    if (!timeStr) return '';
-    const [hStr, mStr] = timeStr.split(':');
-    let h = parseInt(hStr, 10);
-    const m = mStr || '00';
-    const ampm = h >= 12 ? 'PM' : 'AM';
-    h = h % 12;
-    if (h === 0) h = 12;
-    return `${h}:${m} ${ampm}`;
-}
+/* =========================================================
+   SELECT SERVICE
+========================================================= */
 
-// Update sticky summary sidebar in real-time
-function updateSummary() {
-    const serviceEl = document.getElementById('summaryService');
-    const durationEl = document.getElementById('summaryDuration');
-    const barberEl = document.getElementById('summaryBarber');
-    const dateEl = document.getElementById('summaryDate');
-    const timeEl = document.getElementById('summaryTime');
-    const priceEl = document.getElementById('summaryPrice');
+function selectService(service) {
 
-    if (serviceEl) serviceEl.textContent = bookingState.service ? bookingState.service.name : 'Not selected';
-    if (durationEl) durationEl.textContent = bookingState.service ? `${bookingState.service.duration} mins` : '—';
-    if (barberEl) barberEl.textContent = bookingState.barber ? bookingState.barber.name : 'Not selected';
-    
-    if (dateEl) {
-        if (bookingState.date) {
-            const d = new Date(bookingState.date + 'T00:00:00');
-            dateEl.textContent = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-        } else {
-            dateEl.textContent = '—';
-        }
-    }
-
-    if (timeEl) timeEl.textContent = bookingState.time ? formatTimeLabel(bookingState.time) : '—';
-    if (priceEl) priceEl.textContent = bookingState.service ? `₱${bookingState.service.price.toLocaleString()}` : '₱0';
-}
-
-// Stepper Navigation
-window.goToStep = function (stepNumber) {
-    if (stepNumber < 1 || stepNumber > 4) return;
-
-    // Validation checks before advancing
-    if (stepNumber > 1 && !bookingState.service) {
-        window.showToast('Please select a service first.', 'info');
-        return;
-    }
-    if (stepNumber > 2 && !bookingState.barber) {
-        window.showToast('Please select a barber first.', 'info');
-        return;
-    }
-    if (stepNumber > 3 && (!bookingState.date || !bookingState.time)) {
-        window.showToast('Please pick an available date and time slot.', 'info');
-        return;
-    }
-
-    bookingState.step = stepNumber;
-
-    // Update Panels
-    document.querySelectorAll('.step-panel').forEach((panel, idx) => {
-        panel.classList.toggle('active', idx + 1 === stepNumber);
-    });
-
-    // Update Stepper Nodes & Progress Fill
-    const nodes = document.querySelectorAll('.step-node');
-    nodes.forEach((node, idx) => {
-        const num = idx + 1;
-        node.classList.remove('active', 'completed');
-        if (num === stepNumber) {
-            node.classList.add('active');
-        } else if (num < stepNumber) {
-            node.classList.add('completed');
-        }
-    });
-
-    const fillPercent = ((stepNumber - 1) / (nodes.length - 1)) * 100;
-    const fillBar = document.getElementById('stepProgressFill');
-    if (fillBar) fillBar.style.width = `${fillPercent}%`;
-
-    window.scrollTo({ top: 120, behavior: 'smooth' });
-};
-
-window.jumpToStep = function (stepNumber) {
-    // Only allow jumping backward or to next accessible step
-    if (stepNumber < bookingState.step) {
-        goToStep(stepNumber);
-    } else if (stepNumber === bookingState.step + 1) {
-        goToStep(stepNumber);
-    }
-};
-
-// Handle final booking submission
-window.handleBookingSubmit = async function (e) {
-    e.preventDefault();
-
-    const name = document.getElementById('custName').value.trim();
-    const email = document.getElementById('custEmail').value.trim();
-    const phone = document.getElementById('custPhone').value.trim();
-    const notes = document.getElementById('custNotes').value.trim();
-
-    if (!bookingState.service || !bookingState.barber || !bookingState.date || !bookingState.time) {
-        window.showToast('Please complete your service, barber, and time selection.', 'error');
-        return;
-    }
-    if (!name || name.length < 2 || !/^\S+@\S+\.\S+$/.test(email) || !/^[0-9+()\s-]{7,30}$/.test(phone)) {
-        window.showToast('Please provide a valid name, email, and phone number.', 'error');
-        return;
-    }
-
-    const submitBtn = document.getElementById('confirmBookingBtn');
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Reserving Chair...';
-
-    const payload = {
-        service_id: bookingState.service.id,
-        barber_id: bookingState.barber.id,
-        booking_date: bookingState.date,
-        start_time: bookingState.time,
-        customer_name: name,
-        customer_email: email,
-        customer_phone: phone,
-        notes: notes,
-        payment_method: 'pay_at_shop'
+    bookingState.service = {
+        id: String(service.id),
+        name: service.name,
+        price: Number(service.price || 0),
+        duration: Number(service.duration || 30)
     };
 
-    try {
-        const res = await window.api.post('/bookings', payload);
+    bookingState.time = '';
 
-        if (res.success && res.data) {
-            const booking = res.data;
-            sessionStorage.setItem('ybc_confirmed_booking', JSON.stringify(booking));
-            window.location.href = `confirmation.html?ref=${booking.booking_reference}`;
-            return;
-        } else {
-            window.showToast(res.message || 'This appointment time is no longer available.', 'error');
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = 'Confirm Booking <i class="fa-solid fa-check"></i>';
-            
-            // If conflict, refresh availability and send back to step 3
-            if (res.status === 409 || res.message.includes('available')) {
-                goToStep(3);
-                fetchAvailability();
-            }
-        }
-    } catch (err) {
-        window.showToast('Unable to complete booking. Please try again.', 'error');
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = 'Confirm Booking <i class="fa-solid fa-check"></i>';
+    document.querySelectorAll('.service-select-item').forEach(item => {
+        item.classList.remove('selected');
+    });
+
+    const selectedCard = document.querySelector(
+        `.service-select-item[data-service-id="${String(service.id)}"]`
+    );
+
+    if (selectedCard) {
+        selectedCard.classList.add('selected');
     }
-};
+
+    resetTimeSlots();
+    updateSummary();
+
+    const nextButton = document.getElementById('step1NextBtn');
+
+    if (nextButton) {
+        nextButton.disabled = false;
+    }
+
+    updateStepUI();
+}
+
+
+/* =========================================================
+   LOAD BARBERS
+========================================================= */
+
+async function loadBarbers() {
+
+    const barberList =
+        document.getElementById(
+            'barberOptionsList'
+        );
+
+    if (!barberList) {
+        return;
+    }
+
+    try {
+
+        barberList.innerHTML = `
+            <div class="api-state">
+                Loading barbers...
+            </div>
+        `;
+
+        const response =
+            await window.api.get('/barbers');
+
+        if (
+            !response.success ||
+            !Array.isArray(response.data)
+        ) {
+
+            barberList.innerHTML = `
+                <div class="api-state api-state-error">
+                    Unable to load barbers.
+                </div>
+            `;
+
+            return;
+        }
+
+        const activeBarbers =
+            response.data.filter(
+                barber =>
+                    barber.status === 'active' ||
+                    barber.status === 1
+            );
+
+        barberList.innerHTML = '';
+
+
+        /*
+         * ANY AVAILABLE BARBER
+         */
+
+        const anyCard =
+            createBarberCard({
+
+                id: 'any',
+
+                name:
+                    'Any Available Barber',
+
+                specialty:
+                    'Let us assign the next available barber',
+
+                image:
+                    null
+
+            }, true);
+
+        barberList.appendChild(
+            anyCard
+        );
+
+
+        /*
+         * DATABASE BARBERS
+         */
+
+        activeBarbers.forEach(barber => {
+
+            const card =
+                createBarberCard(
+                    barber,
+                    false
+                );
+
+            barberList.appendChild(
+                card
+            );
+
+        });
+
+
+        if (
+            activeBarbers.length === 0
+        ) {
+
+            barberList.innerHTML = `
+                <div class="api-state">
+                    No barbers are currently available.
+                </div>
+            `;
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            'Barber loading error:',
+            error
+        );
+
+        barberList.innerHTML = `
+            <div class="api-state api-state-error">
+                Unable to load barbers.
+                Please refresh and try again.
+            </div>
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   CREATE BARBER CARD
+========================================================= */
+
+function createBarberCard(
+    barber,
+    isAny
+) {
+
+    const card =
+        document.createElement('button');
+
+    card.type = 'button';
+
+    card.className =
+        'barber-select-item';
+
+    card.dataset.barberId =
+        String(barber.id);
+
+
+    const name =
+        barber.name ||
+        'Barber Specialist';
+
+    const specialty =
+        barber.specialty ||
+        'Barber Specialist';
+
+
+    let imagePath = 'assets/images/barber-1.jpg';
+    if (isAny) {
+        imagePath = 'assets/logo/logo.png';
+    } else if (barber.image && typeof barber.image === 'string' && barber.image.trim()) {
+        imagePath = barber.image.trim();
+    } else if (Number(barber.id) >= 1 && Number(barber.id) <= 3) {
+        imagePath = `assets/images/barber-${barber.id}.jpg`;
+    }
+
+
+    card.innerHTML = `
+
+        <span class="barber-avatar-sm">
+
+            <img
+                src="${escapeHtml(imagePath)}"
+                alt="${escapeHtml(name)}"
+                loading="lazy"
+                onerror="this.src='assets/logo/logo.png'"
+            >
+
+        </span>
+
+        <span class="barber-select-text">
+
+            <h4>${escapeHtml(name)}</h4>
+
+            <span>${escapeHtml(specialty)}</span>
+
+        </span>
+
+    `;
+
+
+    card.addEventListener(
+        'click',
+        () => {
+
+            selectBarber(
+                barber,
+                isAny
+            );
+
+        }
+    );
+
+
+    return card;
+
+}
+
+
+/* =========================================================
+   SELECT BARBER
+========================================================= */
+
+function selectBarber(
+    barber,
+    isAny = false
+) {
+
+    bookingState.barber = {
+
+        id:
+            String(barber.id),
+
+        name:
+            barber.name,
+
+        specialty:
+            barber.specialty ||
+            'Barber Specialist'
+
+    };
+
+    bookingState.time = '';
+
+
+    /*
+     * Remove previous selection.
+     */
+
+    document
+        .querySelectorAll(
+            '.barber-select-item'
+        )
+        .forEach(item => {
+
+            item.classList.remove(
+                'selected'
+            );
+
+        });
+
+
+    /*
+     * Highlight selected barber.
+     */
+
+    const selectedCard =
+        document.querySelector(
+            `.barber-select-item[data-barber-id="${CSS.escape(
+                String(barber.id)
+            )}"]`
+        );
+
+    if (selectedCard) {
+
+        selectedCard.classList.add(
+            'selected'
+        );
+
+    }
+
+
+    resetTimeSlots();
+
+    updateSummary();
+
+    updateStepUI();
+
+}
+
+
+/* =========================================================
+   PREFILL LOGGED-IN USER
+========================================================= */
+
+function prefillLoggedInUser() {
+
+    const user =
+        window.api &&
+        typeof window.api.getUser === 'function'
+            ? window.api.getUser()
+            : null;
+
+    if (!user) {
+        return;
+    }
+
+
+    const nameField =
+        document.getElementById(
+            'custName'
+        );
+
+    const emailField =
+        document.getElementById(
+            'custEmail'
+        );
+
+    const phoneField =
+        document.getElementById(
+            'custPhone'
+        );
+
+
+    if (
+        nameField &&
+        user.name
+    ) {
+
+        nameField.value =
+            user.name;
+
+    }
+
+
+    if (
+        emailField &&
+        user.email
+    ) {
+
+        emailField.value =
+            user.email;
+
+    }
+
+
+    if (
+        phoneField &&
+        user.phone
+    ) {
+
+        phoneField.value =
+            user.phone;
+
+    }
+
+}
+
+
+/* =========================================================
+   AVAILABILITY
+========================================================= */
+
+async function fetchAvailability() {
+
+    const slotsGrid =
+        document.getElementById(
+            'slotsGrid'
+        );
+
+    const message =
+        document.getElementById(
+            'slotDurationNote'
+        );
+
+
+    if (!slotsGrid) {
+        return;
+    }
+
+
+    if (
+        !bookingState.service ||
+        !bookingState.barber ||
+        !bookingState.date
+    ) {
+
+        resetTimeSlots();
+
+        return;
+
+    }
+
+
+    const requestId =
+        ++availabilityRequestId;
+
+
+    bookingState.time = '';
+
+
+    const loadingMsg =
+        document.getElementById(
+            'slotsLoadingMsg'
+        );
+
+
+    slotsGrid.innerHTML = '';
+    slotsGrid.style.display = 'none';
+
+    if (loadingMsg) {
+        loadingMsg.style.display = 'block';
+    }
+
+
+    if (message) {
+
+        message.textContent =
+            'Checking available appointment times...';
+
+    }
+
+
+    try {
+
+        /*
+         * SPECIFIC BARBER
+         */
+
+        if (
+            bookingState.barber.id !==
+            'any'
+        ) {
+
+            const response =
+                await getBarberAvailability(
+                    bookingState.barber.id
+                );
+
+
+            if (
+                requestId !==
+                availabilityRequestId
+            ) {
+
+                return;
+
+            }
+
+
+            if (
+                response.success &&
+                response.data
+            ) {
+
+                renderTimeSlots(
+                    response.data.slots || []
+                );
+
+                return;
+
+            }
+
+
+            renderNoAvailability(
+                response.message ||
+                'Unable to check availability.'
+            );
+
+            return;
+
+        }
+
+
+        /*
+         * ANY AVAILABLE BARBER
+         */
+
+        const response =
+            await getAnyBarberAvailability();
+
+
+        if (
+            requestId !==
+            availabilityRequestId
+        ) {
+
+            return;
+
+        }
+
+
+        if (
+            !response.slots ||
+            response.slots.length === 0
+        ) {
+
+            renderNoAvailability(
+                'No barber is available for this date.'
+            );
+
+            return;
+
+        }
+
+
+        renderTimeSlots(
+            response.slots
+        );
+
+
+    } catch (error) {
+
+        if (
+            requestId !==
+            availabilityRequestId
+        ) {
+
+            return;
+
+        }
+
+
+        console.error(
+            'Availability error:',
+            error
+        );
+
+
+        renderNoAvailability(
+            'We could not check availability. Please try again.'
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   SPECIFIC BARBER AVAILABILITY
+========================================================= */
+
+async function getBarberAvailability(
+    barberId
+) {
+
+    const query =
+        `/bookings/availability` +
+        `?barber_id=${encodeURIComponent(
+            barberId
+        )}` +
+        `&service_id=${encodeURIComponent(
+            bookingState.service.id
+        )}` +
+        `&date=${encodeURIComponent(
+            bookingState.date
+        )}`;
+
+
+    return await window.api.get(
+        query
+    );
+
+}
+
+
+/* =========================================================
+   ANY BARBER AVAILABILITY
+========================================================= */
+
+async function getAnyBarberAvailability() {
+
+    const response =
+        await window.api.get(
+            '/barbers'
+        );
+
+
+    if (
+        !response.success ||
+        !Array.isArray(
+            response.data
+        )
+    ) {
+
+        return {
+            slots: []
+        };
+
+    }
+
+
+    const activeBarbers =
+        response.data.filter(
+            barber =>
+                barber.status === 'active' ||
+                barber.status === 1
+        );
+
+
+    if (
+        activeBarbers.length === 0
+    ) {
+
+        return {
+            slots: []
+        };
+
+    }
+
+
+    const availabilityResults =
+        await Promise.all(
+            activeBarbers.map(
+                async barber => {
+
+                    try {
+
+                        const result =
+                            await getBarberAvailability(
+                                barber.id
+                            );
+
+
+                        if (
+                            !result.success ||
+                            !result.data ||
+                            !Array.isArray(
+                                result.data.slots
+                            )
+                        ) {
+
+                            return [];
+
+                        }
+
+
+                        return result.data.slots
+                            .filter(
+                                slot =>
+                                    slot.available !== false
+                            )
+                            .map(
+                                slot => ({
+                                    time:
+                                        slot.time,
+
+                                    available:
+                                        true
+                                })
+                            );
+
+                    } catch (error) {
+
+                        console.error(
+                            `Availability error for barber ${barber.id}:`,
+                            error
+                        );
+
+                        return [];
+
+                    }
+
+                }
+            )
+        );
+
+
+    /*
+     * Merge duplicate times.
+     */
+
+    const merged =
+        new Map();
+
+
+    availabilityResults
+        .flat()
+        .forEach(slot => {
+
+            if (
+                !merged.has(
+                    slot.time
+                )
+            ) {
+
+                merged.set(
+                    slot.time,
+                    {
+                        time:
+                            slot.time,
+
+                        available:
+                            true
+                    }
+                );
+
+            }
+
+        });
+
+
+    const slots =
+        Array.from(
+            merged.values()
+        );
+
+
+    slots.sort(
+        (a, b) =>
+            timeToMinutes(
+                a.time
+            ) -
+            timeToMinutes(
+                b.time
+            )
+    );
+
+
+    return {
+        slots
+    };
+
+}
+
+
+/* =========================================================
+   RENDER TIME SLOTS
+========================================================= */
+
+function renderTimeSlots(
+    slots
+) {
+
+    const slotsGrid =
+        document.getElementById(
+            'slotsGrid'
+        );
+
+    const message =
+        document.getElementById(
+            'slotDurationNote'
+        );
+
+
+    if (!slotsGrid) {
+        return;
+    }
+
+
+    if (
+        !Array.isArray(slots) ||
+        slots.length === 0
+    ) {
+
+        renderNoAvailability(
+            'No available time slots for this date.'
+        );
+
+        return;
+
+    }
+
+
+    slotsGrid.innerHTML = '';
+    slotsGrid.style.display = 'grid';
+
+    const loadingMsg =
+        document.getElementById(
+            'slotsLoadingMsg'
+        );
+
+    if (loadingMsg) {
+        loadingMsg.style.display = 'none';
+    }
+
+
+    slots.forEach(slot => {
+
+        const isAvailable =
+            slot.available !== false;
+
+        const button =
+            document.createElement(
+                'button'
+            );
+
+        button.type =
+            'button';
+
+        button.className =
+            'slot-btn';
+
+        button.dataset.time =
+            slot.time;
+
+        button.disabled =
+            !isAvailable;
+
+        button.textContent =
+            formatTimeLabel(
+                slot.time
+            );
+
+
+        if (isAvailable) {
+
+            button.addEventListener(
+                'click',
+                () => {
+
+                    selectTimeSlot(
+                        slot.time
+                    );
+
+                }
+            );
+
+        }
+
+
+        slotsGrid.appendChild(
+            button
+        );
+
+    });
+
+
+    if (
+        slotsGrid.children.length === 0 ||
+        !slotsGrid.querySelector('.slot-btn:not(:disabled)')
+    ) {
+
+        renderNoAvailability(
+            'No available time slots for this date.'
+        );
+
+        return;
+
+    }
+
+
+    if (message) {
+
+        if (
+            bookingState.barber.id ===
+            'any'
+        ) {
+
+            message.textContent =
+                'These times have at least one available barber. We will assign one automatically.';
+
+        } else {
+
+            message.textContent =
+                `Available times for ${bookingState.barber.name}.`;
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   SELECT TIME SLOT
+========================================================= */
+
+function selectTimeSlot(
+    time
+) {
+
+    bookingState.time =
+        time;
+
+
+    document
+        .querySelectorAll(
+            '.slot-btn'
+        )
+        .forEach(button => {
+
+            button.classList.toggle(
+                'selected',
+                button.dataset.time ===
+                time
+            );
+
+        });
+
+
+    updateSummary();
+
+    updateStepUI();
+
+}
+
+
+/* =========================================================
+   NO AVAILABILITY
+========================================================= */
+
+function renderNoAvailability(
+    messageText
+) {
+
+    const slotsGrid =
+        document.getElementById(
+            'slotsGrid'
+        );
+
+    const message =
+        document.getElementById(
+            'slotDurationNote'
+        );
+
+
+    const loadingMsg =
+        document.getElementById(
+            'slotsLoadingMsg'
+        );
+
+    if (loadingMsg) {
+        loadingMsg.style.display = 'none';
+    }
+
+
+    if (slotsGrid) {
+
+        slotsGrid.style.display = 'grid';
+
+        slotsGrid.innerHTML = `
+            <div class="api-state">
+                <i class="fa-regular fa-calendar-xmark" style="font-size:20px;margin-bottom:8px;display:block;"></i>
+                No available time slots.
+            </div>
+        `;
+
+    }
+
+
+    if (message) {
+
+        message.textContent =
+            messageText;
+
+    }
+
+
+    bookingState.time = '';
+
+    updateSummary();
+
+}
+
+
+/* =========================================================
+   RESET TIME SLOTS
+========================================================= */
+
+function resetTimeSlots() {
+
+    const slotsGrid =
+        document.getElementById(
+            'slotsGrid'
+        );
+
+    const message =
+        document.getElementById(
+            'slotDurationNote'
+        );
+
+
+    availabilityRequestId++;
+
+
+    bookingState.time = '';
+
+
+    const loadingMsg =
+        document.getElementById(
+            'slotsLoadingMsg'
+        );
+
+    if (loadingMsg) {
+        loadingMsg.style.display = 'none';
+    }
+
+
+    if (slotsGrid) {
+
+        slotsGrid.style.display = 'grid';
+
+        slotsGrid.innerHTML = `
+            <div class="api-state">
+                Select a service, barber, and date first.
+            </div>
+        `;
+
+    }
+
+
+    if (message) {
+
+        message.textContent =
+            'Available appointment times will appear here.';
+
+    }
+
+
+    updateSummary();
+
+}
+
+
+/* =========================================================
+   TIME FORMATTER
+========================================================= */
+
+function formatTimeLabel(
+    time
+) {
+
+    if (!time) {
+        return '';
+    }
+
+
+    const parts =
+        String(time).split(':');
+
+
+    let hour =
+        Number.parseInt(
+            parts[0],
+            10
+        );
+
+
+    const minute =
+        parts[1] || '00';
+
+
+    if (
+        Number.isNaN(hour)
+    ) {
+
+        return String(time);
+
+    }
+
+
+    const period =
+        hour >= 12
+            ? 'PM'
+            : 'AM';
+
+
+    hour =
+        hour % 12 || 12;
+
+
+    return `${hour}:${minute} ${period}`;
+
+}
+
+
+/* =========================================================
+   TIME TO MINUTES
+========================================================= */
+
+function timeToMinutes(
+    time
+) {
+
+    const [
+        hours,
+        minutes = '00'
+    ] =
+        String(time).split(':');
+
+
+    return (
+        Number(hours) * 60 +
+        Number(minutes)
+    );
+
+}
+
+
+/* =========================================================
+   BOOKING SUMMARY
+========================================================= */
+
+function updateSummary() {
+
+    const serviceElement =
+        document.getElementById(
+            'summaryService'
+        );
+
+    const barberElement =
+        document.getElementById(
+            'summaryBarber'
+        );
+
+    const dateElement =
+        document.getElementById(
+            'summaryDate'
+        );
+
+    const timeElement =
+        document.getElementById(
+            'summaryTime'
+        );
+
+    const durationElement =
+        document.getElementById(
+            'summaryDuration'
+        );
+
+    const paymentElement =
+        document.getElementById(
+            'summaryPayment'
+        );
+
+    const totalElement =
+        document.getElementById(
+            'summaryPrice'
+        );
+
+
+    /*
+     * SERVICE
+     */
+
+    if (serviceElement) {
+
+        serviceElement.textContent =
+            bookingState.service
+                ? bookingState.service.name
+                : 'Not selected';
+
+    }
+
+
+    /*
+     * BARBER
+     */
+
+    if (barberElement) {
+
+        barberElement.textContent =
+            bookingState.barber
+                ? bookingState.barber.name
+                : 'Not selected';
+
+    }
+
+
+    /*
+     * DATE
+     */
+
+    if (dateElement) {
+
+        if (
+            bookingState.date
+        ) {
+
+            const date =
+                new Date(
+                    `${bookingState.date}T00:00:00`
+                );
+
+
+            dateElement.textContent =
+                date.toLocaleDateString(
+                    'en-US',
+                    {
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric'
+                    }
+                );
+
+        } else {
+
+            dateElement.textContent =
+                'Not selected';
+
+        }
+
+    }
+
+
+    /*
+     * TIME
+     */
+
+    if (timeElement) {
+
+        timeElement.textContent =
+            bookingState.time
+                ? formatTimeLabel(
+                    bookingState.time
+                )
+                : 'Not selected';
+
+    }
+
+
+    /*
+     * DURATION
+     */
+
+    if (durationElement) {
+
+        durationElement.textContent =
+            bookingState.service
+                ? `${bookingState.service.duration} minutes`
+                : '—';
+
+    }
+
+
+    /*
+     * PAYMENT
+     */
+
+    const paymentSelect =
+        document.getElementById(
+            'paymentMethod'
+        );
+
+
+    if (paymentElement) {
+
+        if (
+            paymentSelect &&
+            paymentSelect.value
+        ) {
+
+            const option =
+                paymentSelect.options[
+                    paymentSelect.selectedIndex
+                ];
+
+
+            paymentElement.textContent =
+                option.textContent.trim();
+
+        } else {
+
+            paymentElement.textContent =
+                'Pay at Shop';
+
+        }
+
+    }
+
+
+    /*
+     * TOTAL
+     */
+
+    if (totalElement) {
+
+        const price =
+            bookingState.service
+                ? Number(
+                    bookingState.service.price
+                )
+                : 0;
+
+
+        totalElement.textContent =
+            price.toLocaleString(
+                'en-PH',
+                {
+                    style: 'currency',
+                    currency: 'PHP',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }
+            );
+
+    }
+
+}
+
+
+/* =========================================================
+   CUSTOMER INFORMATION
+========================================================= */
+
+function getCustomerInformation() {
+
+    const nameField =
+        document.getElementById(
+            'custName'
+        );
+
+    const emailField =
+        document.getElementById(
+            'custEmail'
+        );
+
+    const phoneField =
+        document.getElementById(
+            'custPhone'
+        );
+
+    const notesField =
+        document.getElementById(
+            'custNotes'
+        );
+
+
+    if (
+        !nameField ||
+        !emailField ||
+        !phoneField
+    ) {
+
+        window.showToast(
+            'Unable to read your booking information.',
+            'error'
+        );
+
+        return null;
+
+    }
+
+
+    const name =
+        nameField.value.trim();
+
+
+    const email =
+        emailField.value
+            .trim()
+            .toLowerCase();
+
+
+    const phone =
+        phoneField.value.trim();
+
+
+    const notes =
+        notesField
+            ? notesField.value.trim()
+            : '';
+
+
+    const emailPattern =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+
+    const phonePattern =
+        /^[0-9+()\s-]{7,30}$/;
+
+
+    if (
+        name.length < 2 ||
+        name.length > 100
+    ) {
+
+        window.showToast(
+            'Please enter your full name.',
+            'error'
+        );
+
+        nameField.focus();
+
+        return null;
+
+    }
+
+
+    if (
+        !emailPattern.test(email)
+    ) {
+
+        window.showToast(
+            'Please enter a valid email address.',
+            'error'
+        );
+
+        emailField.focus();
+
+        return null;
+
+    }
+
+
+    if (
+        !phonePattern.test(phone)
+    ) {
+
+        window.showToast(
+            'Please enter a valid phone number.',
+            'error'
+        );
+
+        phoneField.focus();
+
+        return null;
+
+    }
+
+
+    return {
+
+        name,
+
+        email,
+
+        phone,
+
+        notes
+
+    };
+
+}
+
+
+/* =========================================================
+   BOOKING SUBMISSION
+========================================================= */
+
+let isBookingSubmitting = false;
+
+async function handleBookingSubmit(
+    event
+) {
+
+    if (event && event.preventDefault) {
+        event.preventDefault();
+    }
+
+    if (isBookingSubmitting) {
+        return;
+    }
+
+
+    /*
+     * AUTHENTICATION
+     */
+
+    const token =
+        localStorage.getItem(
+            'ybc_token'
+        );
+
+    const user =
+        localStorage.getItem(
+            'ybc_user'
+        );
+
+
+    if (
+        !token ||
+        !user
+    ) {
+
+        window.showToast(
+            'Please, login first before booking appointment.',
+            'info'
+        );
+
+
+        setTimeout(
+            () => {
+
+                window.location.href =
+                    'register.html';
+
+            },
+            700
+        );
+
+
+        return;
+
+    }
+
+
+    /*
+     * REQUIRED SELECTIONS
+     */
+
+    if (
+        !bookingState.service
+    ) {
+
+        window.showToast(
+            'Please select a service.',
+            'error'
+        );
+
+        goToStep(1);
+
+        return;
+
+    }
+
+
+    if (
+        !bookingState.barber
+    ) {
+
+        window.showToast(
+            'Please select a barber.',
+            'error'
+        );
+
+        goToStep(2);
+
+        return;
+
+    }
+
+
+    if (
+        !bookingState.date
+    ) {
+
+        window.showToast(
+            'Please select an appointment date.',
+            'error'
+        );
+
+        goToStep(3);
+
+        return;
+
+    }
+
+
+    if (
+        !bookingState.time
+    ) {
+
+        window.showToast(
+            'Please select an available time.',
+            'error'
+        );
+
+        goToStep(3);
+
+        return;
+
+    }
+
+
+    /*
+     * CUSTOMER
+     */
+
+    const customer =
+        getCustomerInformation();
+
+
+    if (!customer) {
+        return;
+    }
+
+
+    bookingState.customer =
+        customer;
+
+
+    /*
+     * SUBMIT BUTTON
+     */
+
+    const submitButton =
+        document.getElementById(
+            'confirmBookingBtn'
+        );
+
+
+    if (!submitButton) {
+        return;
+    }
+
+
+    submitButton.disabled =
+        true;
+
+
+    submitButton.innerHTML = `
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        Reserving Chair...
+    `;
+
+
+    /*
+     * PAYMENT
+     */
+
+    const paymentSelect =
+        document.getElementById(
+            'paymentMethod'
+        );
+
+
+    const paymentMethod =
+        paymentSelect &&
+        paymentSelect.value
+            ? paymentSelect.value
+            : 'pay_at_shop';
+
+
+    /*
+     * PAYLOAD
+     */
+
+    const payload = {
+
+        service_id:
+            bookingState.service.id,
+
+        /*
+         * If "Any Available Barber"
+         * was selected, send "any".
+         *
+         * Backend is responsible for
+         * assigning an available barber.
+         */
+
+        barber_id:
+            bookingState.barber.id,
+
+        booking_date:
+            bookingState.date,
+
+        start_time:
+            bookingState.time,
+
+        customer_name:
+            customer.name,
+
+        customer_email:
+            customer.email,
+
+        customer_phone:
+            customer.phone,
+
+        notes:
+            customer.notes,
+
+        payment_method:
+            paymentMethod
+
+    };
+
+
+    isBookingSubmitting = true;
+
+    try {
+
+        const response =
+            await window.api.post(
+                '/bookings',
+                payload
+            );
+
+
+        /*
+         * SUCCESS
+         */
+
+        if (
+            response.success &&
+            response.data
+        ) {
+
+            const booking =
+                response.data;
+
+
+            /*
+             * Store booking details
+             * for confirmation.html.
+             */
+
+            sessionStorage.setItem(
+                'ybc_confirmed_booking',
+                JSON.stringify(
+                    booking
+                )
+            );
+
+            localStorage.setItem(
+                'ybc_last_booking',
+                JSON.stringify(
+                    booking
+                )
+            );
+
+
+            /*
+             * Redirect to confirmation page.
+             */
+
+            window.location.href =
+                `confirmation.html?ref=${encodeURIComponent(
+                    booking.booking_reference ||
+                    ''
+                )}`;
+
+
+            return;
+
+        }
+
+
+        /*
+         * SERVER ERROR
+         */
+
+        isBookingSubmitting = false;
+
+        const message =
+            response.message ||
+            'Unable to complete your booking.';
+
+
+        window.showToast(
+            message,
+            'error'
+        );
+
+
+        submitButton.disabled =
+            false;
+
+
+        submitButton.innerHTML = `
+            <i class="fa-solid fa-calendar-check"></i>
+            Confirm Appointment
+        `;
+
+
+        /*
+         * Refresh availability
+         * when a booking conflict occurs.
+         */
+
+        const lowerMessage =
+            String(
+                message
+            ).toLowerCase();
+
+
+        const conflict =
+            response.status === 409 ||
+            lowerMessage.includes(
+                'available'
+            ) ||
+            lowerMessage.includes(
+                'booked'
+            ) ||
+            lowerMessage.includes(
+                'conflict'
+            );
+
+
+        if (conflict) {
+
+            bookingState.time = '';
+
+            resetTimeSlots();
+
+
+            if (
+                bookingState.service &&
+                bookingState.barber &&
+                bookingState.date
+            ) {
+
+                await fetchAvailability();
+
+            }
+
+        }
+
+
+    } catch (error) {
+
+        isBookingSubmitting = false;
+
+        console.error(
+            'Booking submission error:',
+            error
+        );
+
+
+        window.showToast(
+            'Unable to complete booking. Please try again.',
+            'error'
+        );
+
+
+        submitButton.disabled =
+            false;
+
+
+        submitButton.innerHTML = `
+            <i class="fa-solid fa-calendar-check"></i>
+            Confirm Appointment
+        `;
+
+    }
+
+}
+
+
+function handleStep1Next() {
+    if (!bookingState.service) {
+        window.showToast('Please select a service first.', 'error');
+        return;
+    }
+
+    goToStep(2);
+}
+
+
+/* =========================================================
+   STEP 2
+========================================================= */
+
+function handleStep2Next() {
+
+    if (
+        !bookingState.barber
+    ) {
+
+        window.showToast(
+            'Please select a barber first.',
+            'error'
+        );
+
+        return;
+
+    }
+
+    goToStep(3);
+
+}
+
+
+/* =========================================================
+   STEP 3
+========================================================= */
+
+function handleStep3Next() {
+
+    if (
+        !bookingState.date
+    ) {
+
+        window.showToast(
+            'Please select a date.',
+            'error'
+        );
+
+        return;
+
+    }
+
+
+    if (
+        !bookingState.time
+    ) {
+
+        window.showToast(
+            'Please select an available time.',
+            'error'
+        );
+
+        return;
+
+    }
+
+
+    updateSummary();
+
+    goToStep(4);
+
+}
+
+
+/* =========================================================
+   STEP NAVIGATION
+========================================================= */
+
+function goToStep(
+    step
+) {
+
+    currentStep = step;
+
+
+    const steps =
+        document.querySelectorAll(
+            '.step-node'
+        );
+
+
+    steps.forEach(
+        stepElement => {
+
+            const stepNumber =
+                Number(
+                    stepElement.dataset.step
+                );
+
+
+            stepElement.classList.toggle(
+                'active',
+                stepNumber === step
+            );
+
+
+            stepElement.classList.toggle(
+                'completed',
+                stepNumber < step
+            );
+
+        }
+    );
+
+
+    const panels =
+        document.querySelectorAll(
+            '.step-panel'
+        );
+
+
+    panels.forEach(
+        panel => {
+
+            const panelStep =
+                Number(
+                    panel.id.replace(
+                        'stepPanel',
+                        ''
+                    )
+                );
+
+
+            panel.classList.toggle(
+                'active',
+                panelStep === step
+            );
+
+        }
+    );
+
+
+    /*
+     * Update the connecting progress bar fill.
+     * 4 steps -> 3 gaps between nodes (0%, 33%, 66%, 100%).
+     */
+
+    const progressFill =
+        document.getElementById(
+            'stepProgressFill'
+        );
+
+    if (progressFill) {
+
+        const totalSteps = 4;
+
+        const percent =
+            ((step - 1) / (totalSteps - 1)) * 100;
+
+        progressFill.style.width =
+            `${percent}%`;
+
+    }
+
+
+    updateStepUI();
+
+
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+
+}
+
+
+/* =========================================================
+   JUMP TO STEP (clicking a step circle)
+========================================================= */
+
+function getMaxUnlockedStep() {
+
+    if (
+        bookingState.date &&
+        bookingState.time
+    ) {
+        return 4;
+    }
+
+    if (bookingState.barber) {
+        return 3;
+    }
+
+    if (bookingState.service) {
+        return 2;
+    }
+
+    return 1;
+
+}
+
+function jumpToStep(step) {
+
+    const maxUnlocked =
+        getMaxUnlockedStep();
+
+    if (step > maxUnlocked) {
+
+        window.showToast(
+            'Please complete the current step first.',
+            'error'
+        );
+
+        return;
+
+    }
+
+    goToStep(step);
+
+}
+
+window.jumpToStep = jumpToStep;
+
+
+/* =========================================================
+   STEP UI
+========================================================= */
+
+function updateStepUI() {
+
+    const step1Next =
+        document.getElementById(
+            'step1NextBtn'
+        );
+
+    const step2Next =
+        document.getElementById(
+            'step2NextBtn'
+        );
+
+    const step3Next =
+        document.getElementById(
+            'step3NextBtn'
+        );
+
+
+    if (step1Next) {
+
+        step1Next.disabled =
+            !bookingState.service;
+
+    }
+
+
+    if (step2Next) {
+
+        step2Next.disabled =
+            !bookingState.barber;
+
+    }
+
+
+    if (step3Next) {
+
+        step3Next.disabled =
+            !bookingState.date ||
+            !bookingState.time;
+
+    }
+
+
+    /*
+     * Make sure the final summary
+     * always reflects current state.
+     */
+
+    updateSummary();
+
+}
+
+
+/* =========================================================
+   OPTIONAL BOOKING MODAL
+========================================================= */
+
+function closeBookingModal() {
+
+    const modal =
+        document.getElementById(
+            'bookingModal'
+        );
+
+    if (!modal) {
+        return;
+    }
+
+    modal.classList.remove(
+        'active'
+    );
+
+}
+
+
+window.closeBookingModal =
+    closeBookingModal;
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHtml(
+    value
+) {
+
+    return String(
+        value ?? ''
+    )
+        .replace(
+            /&/g,
+            '&amp;'
+        )
+        .replace(
+            /</g,
+            '&lt;'
+        )
+        .replace(
+            />/g,
+            '&gt;'
+        )
+        .replace(
+            /"/g,
+            '&quot;'
+        )
+        .replace(
+            /'/g,
+            '&#039;'
+        );
+
+}
+
+
+/* =========================================================
+   EXPORT STATE FOR DEBUGGING
+========================================================= */
+
+window.yankiiiBookingState =
+    bookingState;

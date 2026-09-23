@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="../css/admin.css">
     <link rel="stylesheet" href="../css/responsive.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <meta name="robots" content="noindex, nofollow">
 </head>
 
 <body class="admin-body">
@@ -98,45 +99,177 @@
                 <h3 id="barberModalTitle">Add Barber</h3>
                 <button type="button" class="modal-close" onclick="closeBarberModal()">&times;</button>
             </div>
-            <form id="barberForm" onsubmit="handleSaveBarber(event)">
-                <div class="modal-body">
-                    <input type="hidden" id="barberFormId">
+<form
+    id="barberForm"
+    onsubmit="handleSaveBarber(event)"
+>
 
-                    <div class="form-group">
-                        <label class="form-label" for="barberName">Barber Full Name *</label>
-                        <input type="text" id="barberName" class="form-control" placeholder="e.g. Mark Santos" required>
-                    </div>
+    <input
+        type="hidden"
+        id="barberFormId"
+    >
 
-                    <div class="form-group">
-                        <label class="form-label" for="barberSpecialty">Specialty / Title *</label>
-                        <input type="text" id="barberSpecialty" class="form-control" placeholder="e.g. Senior Barber / Fade Specialist" required>
-                    </div>
 
-                    <div class="form-group">
-                        <label class="form-label" for="barberBio">Bio / Profile Description</label>
-                        <textarea id="barberBio" class="form-control" placeholder="Brief barber bio and experience..." rows="3"></textarea>
-                    </div>
+    <!-- BARBER NAME -->
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                        <div class="form-group">
-                            <label class="form-label" for="barberImage">Local Image Path</label>
-                            <input type="text" id="barberImage" class="form-control" placeholder="assets/images/barber-1.jpg">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="barberStatus">Status *</label>
-                            <select id="barberStatus" class="form-select" required>
-                                <option value="active">Active (Available for booking)</option>
-                                <option value="inactive">Inactive (Off roster)</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
+    <div class="form-group">
 
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline btn-sm" onclick="closeBarberModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary btn-sm" id="saveBarberBtn">Save Barber</button>
-                </div>
-            </form>
+        <label
+            class="form-label"
+            for="barberName"
+        >
+            Barber Name
+        </label>
+
+        <input
+            type="text"
+            id="barberName"
+            class="form-control"
+            placeholder="Enter barber name"
+            required
+        >
+
+    </div>
+
+
+    <!-- SPECIALTY -->
+
+    <div class="form-group">
+
+        <label
+            class="form-label"
+            for="barberSpecialty"
+        >
+            Specialty
+        </label>
+
+        <input
+            type="text"
+            id="barberSpecialty"
+            class="form-control"
+            placeholder="Example: Fade Specialist"
+            required
+        >
+
+    </div>
+
+
+    <!-- BIO -->
+
+    <div class="form-group">
+
+        <label
+            class="form-label"
+            for="barberBio"
+        >
+            Biography
+        </label>
+
+        <textarea
+            id="barberBio"
+            class="form-control"
+            rows="4"
+            placeholder="Write a short barber biography..."
+        ></textarea>
+
+    </div>
+
+
+    <!-- BARBER PHOTO -->
+
+    <div class="form-group">
+
+        <label
+            class="form-label"
+            for="barberImage"
+        >
+            Barber Photo
+        </label>
+
+        <input
+            type="text"
+            id="barberImage"
+            class="form-control"
+            placeholder="/assets/images/barber-1.jpg"
+        >
+
+        <small
+            style="
+                display:block;
+                margin-top:6px;
+                color:#65705f;
+                font-size:12px;
+                line-height:1.5;
+            "
+        >
+            Enter the image path.
+            Example:
+            /assets/images/barber-1.jpg
+        </small>
+
+    </div>
+
+
+    <!-- STATUS -->
+
+    <div class="form-group">
+
+        <label
+            class="form-label"
+            for="barberStatus"
+        >
+            Status
+        </label>
+
+        <select
+            id="barberStatus"
+            class="form-control"
+        >
+
+            <option value="active">
+                Active
+            </option>
+
+            <option value="inactive">
+                Inactive
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <!-- BUTTONS -->
+
+    <div
+        class="modal-actions"
+        style="
+            display:flex;
+            justify-content:flex-end;
+            gap:10px;
+            margin-top:20px;
+        "
+    >
+
+        <button
+            type="button"
+            class="btn btn-outline"
+            onclick="closeBarberModal()"
+        >
+            Cancel
+        </button>
+
+        <button
+            type="submit"
+            class="btn btn-primary"
+        >
+            <i class="fa-solid fa-floppy-disk"></i>
+            Save Barber
+        </button>
+
+    </div>
+
+</form>
         </div>
     </div>
 
@@ -169,6 +302,7 @@
             initBarbersPage();
         });
     </script>
+    <script src="/js/cookie-consent.js"></script>
 </body>
 
 </html>

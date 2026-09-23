@@ -63,8 +63,8 @@ window.handleRegister = async function (e) {
         return;
     }
 
-    if (password.length < 6) {
-        window.showToast('Password must be at least 6 characters.', 'error');
+    if (password.length < 8 || password.length > 128 || !/[a-z]/.test(password) || !/[A-Z]/.test(password) || !/\d/.test(password)) {
+        window.showToast('Use 8 to 128 characters, including uppercase, lowercase, and a number.', 'error');
         return;
     }
 
