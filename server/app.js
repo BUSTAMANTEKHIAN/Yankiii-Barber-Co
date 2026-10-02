@@ -24,6 +24,7 @@ const bookingRoutes = require('./routes/bookingRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
+const businessHoursRoutes = require('./routes/businessHoursRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -131,6 +132,7 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/feedback', feedbackRoutes);
+app.use('/api/business-hours', businessHoursRoutes);
 
 // Friendly 404 for API calls and unknown page routes.
 app.use((req, res, next) => {

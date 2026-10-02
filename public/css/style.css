@@ -1987,3 +1987,29 @@ textarea.form-control {
         width: 120px;
     }
 }
+
+/* ================= REVIEW SYSTEM STYLES ================= */
+.star-rate {
+    transition: color 0.15s ease, transform 0.15s ease;
+    cursor: pointer;
+}
+.star-rate:hover {
+    transform: scale(1.15);
+}
+.star-rate.active {
+    color: #f59e0b !important;
+}
+.reviewed-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: #fef3c7;
+    color: #92400e;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+.reviewed-pill i {
+    color: #f59e0b;
+}

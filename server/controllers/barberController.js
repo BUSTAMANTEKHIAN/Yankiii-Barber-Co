@@ -4,6 +4,7 @@
  */
 
 const pool = require('../config/db');
+const { isSafeImageReference } = require('../utils/imageReference');
 
 async function getAllBarbers(req, res) {
     try {
@@ -29,7 +30,8 @@ async function getAllBarbers(req, res) {
 async function getBarberById(req, res) {
     try {
         const id = parseInt(req.params.id, 10);
-        const [rows] = await pool.query('SELECT * FROM barbers WHERE id = ?', [id]);
+        if (!Number.isInteger(id) || id < 1) return res.status(400).json({ success: false, message: 'Invalid barber ID.' });
+        const [rows] = await pool.query('SELECT * FROM barbers WHERE id = ? AND status = \'active\'', [id]);
 
         if (rows.length === 0) {
             return res.status(404).json({
@@ -69,6 +71,10 @@ async function createBarber(req, res) {
                 success: false,
                 message: 'Barber name and specialty are required.'
             });
+        }
+
+        if (String(name).trim().length > 100 || String(specialty).trim().length > 100 || (bio && String(bio).length > 5000) || !['active', 'inactive'].includes(status || 'active') || !isSafeImageReference(image)) {
+            return res.status(400).json({ success: false, message: 'Please provide valid barber details and a safe image reference.' });
         }
 
         const [result] = await pool.query(
@@ -114,6 +120,10 @@ async function updateBarber(req, res) {
                 success: false,
                 message: 'Barber name and specialty are required.'
             });
+        }
+
+        if (String(name).trim().length > 100 || String(specialty).trim().length > 100 || (bio && String(bio).length > 5000) || !['active', 'inactive'].includes(status || 'active') || !isSafeImageReference(image)) {
+            return res.status(400).json({ success: false, message: 'Please provide valid barber details and a safe image reference.' });
         }
 
         await pool.query(
@@ -230,4 +240,3 @@ module.exports = {
     getBarberSchedule,
     updateBarberSchedule
 };
-

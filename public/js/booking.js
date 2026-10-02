@@ -1225,11 +1225,11 @@ async function getAnyBarberAvailability() {
                             )
                             .map(
                                 slot => ({
-                                    time:
-                                        slot.time,
-
-                                    available:
-                                        true
+                                    time: slot.time,
+                                    barber_id: barber.id,
+                                    barber_name: barber.name,
+                                    barber_specialty: barber.specialty,
+                                    available: true
                                 })
                             );
 
@@ -1272,6 +1272,15 @@ async function getAnyBarberAvailability() {
                     {
                         time:
                             slot.time,
+
+                        barber_id:
+                            slot.barber_id,
+
+                        barber_name:
+                            slot.barber_name,
+
+                        barber_specialty:
+                            slot.barber_specialty,
 
                         available:
                             true
@@ -1377,6 +1386,8 @@ function renderTimeSlots(
         button.dataset.time =
             slot.time;
 
+        if (slot.barber_id) button.dataset.barberId = String(slot.barber_id);
+
         button.disabled =
             !isAvailable;
 
@@ -1390,11 +1401,17 @@ function renderTimeSlots(
 
             button.addEventListener(
                 'click',
-                () => {
+                    () => {
 
-                    selectTimeSlot(
-                        slot.time
-                    );
+                        if (slot.barber_id) {
+                            bookingState.barber = {
+                                id: String(slot.barber_id),
+                                name: slot.barber_name,
+                                specialty: slot.barber_specialty
+                            };
+                        }
+
+                        selectTimeSlot(slot.time);
 
                 }
             );

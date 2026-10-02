@@ -392,6 +392,102 @@
     </div>
 
 
+    <!-- ================= REVIEW MODAL ================= -->
+
+    <div
+        class="modal-backdrop"
+        id="reviewModal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="reviewModalTitle"
+    >
+
+        <div class="modal-dialog" style="max-width: 520px;">
+
+            <div class="modal-header">
+
+                <h3 id="reviewModalTitle">
+                    Rate Your Experience
+                </h3>
+
+                <button
+                    type="button"
+                    class="modal-close"
+                    onclick="closeReviewModal()"
+                    aria-label="Close review dialog"
+                >
+                    &times;
+                </button>
+
+            </div>
+
+            <div class="modal-body" style="padding: 24px;">
+
+                <div id="reviewBookingDetails" style="background:#f5f7f3;border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:13px;color:#475569;border:1px solid #dfe5dc;">
+                    <!-- Filled dynamically -->
+                </div>
+
+                <div style="text-align: center; margin-bottom: 22px;">
+                    <label style="display:block;font-size:13px;font-weight:700;margin-bottom:10px;color:var(--text-dark);">
+                        Your Rating
+                    </label>
+                    <div id="starRatingContainer" style="display:flex;justify-content:center;gap:12px;font-size:30px;color:#d1d5db;">
+                        <i class="fa-solid fa-star star-rate active" data-val="1" onclick="selectStarRating(1)" onmouseover="hoverStarRating(1)" onmouseleave="resetStarRating()"></i>
+                        <i class="fa-solid fa-star star-rate active" data-val="2" onclick="selectStarRating(2)" onmouseover="hoverStarRating(2)" onmouseleave="resetStarRating()"></i>
+                        <i class="fa-solid fa-star star-rate active" data-val="3" onclick="selectStarRating(3)" onmouseover="hoverStarRating(3)" onmouseleave="resetStarRating()"></i>
+                        <i class="fa-solid fa-star star-rate active" data-val="4" onclick="selectStarRating(4)" onmouseover="hoverStarRating(4)" onmouseleave="resetStarRating()"></i>
+                        <i class="fa-solid fa-star star-rate active" data-val="5" onclick="selectStarRating(5)" onmouseover="hoverStarRating(5)" onmouseleave="resetStarRating()"></i>
+                    </div>
+                    <span id="starRatingLabel" style="display:block;font-size:12px;color:#4A6E3D;margin-top:8px;font-weight:700;">5 out of 5 stars (Masterpiece Cut)</span>
+                </div>
+
+                <div>
+                    <label for="reviewComment" style="display:block;font-size:13px;font-weight:700;margin-bottom:6px;color:var(--text-dark);">
+                        Your Feedback / Comments
+                    </label>
+                    <textarea
+                        id="reviewComment"
+                        rows="4"
+                        placeholder="Tell us how your cut turned out, your barber's styling, and your shop experience..."
+                        maxlength="1000"
+                        oninput="onReviewCommentInput(this)"
+                        style="width:100%;border:1px solid #d5dbd1;border-radius:10px;padding:12px;font-family:inherit;font-size:14px;resize:vertical;box-sizing:border-box;"
+                    ></textarea>
+                    <div style="display:flex;justify-content:space-between;font-size:11px;color:#9ca3af;margin-top:5px;">
+                        <span>Your review helps our barbers maintain perfection.</span>
+                        <span id="reviewCharCount">0 / 1000</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="modal-footer" style="padding: 16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:12px;">
+
+                <button
+                    type="button"
+                    class="btn btn-outline btn-sm"
+                    onclick="closeReviewModal()"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary btn-sm"
+                    id="submitReviewBtn"
+                    onclick="submitReview()"
+                >
+                    <i class="fa-solid fa-paper-plane" style="margin-right:6px;"></i>
+                    Submit Review
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
     <!-- ================= FOOTER ================= -->
 
     <footer class="footer">

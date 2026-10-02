@@ -32,15 +32,31 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let booking = null;
 
-    const possibleKeys = [
+    const urlParams =
+        new URLSearchParams(window.location.search);
+
+    const bookingRef =
+        urlParams.get('ref') ||
+        urlParams.get('reference');
+
+    const bookingId =
+        urlParams.get('booking') ||
+        urlParams.get('id');
+
+    /*
+     * 1. Check sessionStorage first (set upon booking creation),
+     * followed by localStorage fallbacks.
+     */
+    const storageKeys = [
+        'ybc_confirmed_booking',
         'ybc_last_booking',
         'ybc_booking',
         'ybc_confirmation'
     ];
 
-    for (const key of possibleKeys) {
-
+    for (const key of storageKeys) {
         const stored =
+            sessionStorage.getItem(key) ||
             localStorage.getItem(key);
 
         if (!stored) {
@@ -48,75 +64,68 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         try {
-
-            booking = JSON.parse(stored);
-
-            if (booking) {
-                break;
+            const parsed = JSON.parse(stored);
+            if (parsed && typeof parsed === 'object') {
+                // If a ref is in the URL, verify it matches the stored booking
+                if (bookingRef) {
+                    const parsedRef = parsed.booking_reference || parsed.reference;
+                    if (parsedRef && String(parsedRef).toUpperCase() === String(bookingRef).toUpperCase()) {
+                        booking = parsed;
+                        break;
+                    }
+                } else if (bookingId) {
+                    if (String(parsed.id) === String(bookingId)) {
+                        booking = parsed;
+                        break;
+                    }
+                } else {
+                    booking = parsed;
+                    break;
+                }
             }
-
         } catch (error) {
-
-            console.warn(
-                `Invalid booking data in localStorage key: ${key}`
-            );
-
+            console.warn(`Invalid booking data in storage key: ${key}`);
         }
     }
 
     /*
-     * Some booking flows may redirect using:
-     *
-     * confirmation.html?booking=123
-     *
-     * If an ID exists, try loading the customer's
-     * bookings from the authenticated API.
+     * 2. If no valid booking was found in storage, but we have a bookingRef,
+     * fetch the booking by reference from the server endpoint.
      */
-
-    const urlParams =
-        new URLSearchParams(window.location.search);
-
-    const bookingId =
-        urlParams.get('booking');
-
-    if (!booking && bookingId) {
-
+    if (!booking && bookingRef) {
         try {
-
-            const response =
-                await window.api.get('/bookings/my');
-
-            if (
-                response.success &&
-                Array.isArray(response.data)
-            ) {
-
-                booking =
-                    response.data.find(
-                        item =>
-                            String(item.id) ===
-                            String(bookingId)
-                    );
+            const response = await window.api.get(`/bookings/ref/${encodeURIComponent(bookingRef)}`);
+            if (response && response.success && response.data) {
+                booking = response.data;
+                sessionStorage.setItem('ybc_confirmed_booking', JSON.stringify(booking));
             }
-
         } catch (error) {
-
-            console.error(
-                'Unable to retrieve booking:',
-                error
-            );
-
+            console.error('Unable to retrieve booking by reference:', error);
         }
     }
 
     /*
-     * No booking information.
+     * 3. If still no booking, but bookingId exists, try fetching from authenticated API.
      */
+    if (!booking && bookingId) {
+        try {
+            const response = await window.api.get('/bookings/my');
+            if (response && response.success && Array.isArray(response.data)) {
+                booking = response.data.find(item => String(item.id) === String(bookingId));
+                if (booking) {
+                    sessionStorage.setItem('ybc_confirmed_booking', JSON.stringify(booking));
+                }
+            }
+        } catch (error) {
+            console.error('Unable to retrieve customer booking:', error);
+        }
+    }
 
+    /*
+     * No booking information found.
+     */
     if (!booking) {
-
         showError();
-
         return;
     }
 

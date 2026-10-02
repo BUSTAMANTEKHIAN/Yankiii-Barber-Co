@@ -17,23 +17,16 @@
         }[char]));
     }
 
-    function getImagePath(image, id) {
-
-        const fallback =
-            `/assets/images/barber-${id}.jpg`;
+    function getImagePath(image) {
 
         if (!image || !String(image).trim()) {
-            return fallback;
+            return '';
         }
 
         let src =
             String(image).trim();
 
-        if (
-            src.startsWith('http://') ||
-            src.startsWith('https://') ||
-            src.startsWith('data:')
-        ) {
+        if (/^https:\/\//i.test(src)) {
             return src;
         }
 
@@ -44,6 +37,8 @@
             src =
                 src.substring(7);
         }
+
+        if (!/^(?:\/)?assets\/(?:images|logo)\/[a-z0-9._-]+\.(?:avif|gif|jpe?g|png|webp|svg)$/i.test(src) || src.includes('..')) return '';
 
         if (!src.startsWith('/')) {
             src =
@@ -121,8 +116,7 @@
 
                     const bio =
                         escapeHtml(
-                            barber.bio ||
-                            'Professional grooming services.'
+                            barber.bio || ''
                         );
 
                     return `
@@ -130,12 +124,7 @@
 
                             <div class="barber-image">
 
-                                <img
-                                    src="${escapeHtml(image)}"
-                                    alt="${name}"
-                                    loading="lazy"
-                                    onerror="this.onerror=null;this.src='/assets/images/barber-${Number(barber.id)}.jpg';"
-                                >
+                                ${image ? `<img src="${escapeHtml(image)}" alt="${name}" loading="lazy" onerror="this.hidden=true">` : ''}
 
                             </div>
 
@@ -149,9 +138,7 @@
                                     ${specialty}
                                 </span>
 
-                                <p>
-                                    ${bio}
-                                </p>
+                                ${bio ? `<p>${bio}</p>` : ''}
 
                                 <a
                                     href="booking.html?barber_id=${encodeURIComponent(barber.id)}"

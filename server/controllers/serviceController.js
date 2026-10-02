@@ -4,6 +4,7 @@
  */
 
 const pool = require('../config/db');
+const { isSafeImageReference } = require('../utils/imageReference');
 
 async function getAllServices(req, res) {
     try {
@@ -29,7 +30,8 @@ async function getAllServices(req, res) {
 async function getServiceById(req, res) {
     try {
         const id = parseInt(req.params.id, 10);
-        const [rows] = await pool.query('SELECT * FROM services WHERE id = ?', [id]);
+        if (!Number.isInteger(id) || id < 1) return res.status(400).json({ success: false, message: 'Invalid service ID.' });
+        const [rows] = await pool.query('SELECT * FROM services WHERE id = ? AND status = \'active\'', [id]);
 
         if (rows.length === 0) {
             return res.status(404).json({
@@ -64,6 +66,10 @@ async function createService(req, res) {
 
         const numPrice = Number(price);
         const numDuration = parseInt(duration, 10);
+
+        if (String(name).trim().length > 100 || (description && String(description).length > 5000) || !['active', 'inactive'].includes(status || 'active') || !isSafeImageReference(image)) {
+            return res.status(400).json({ success: false, message: 'Please provide valid service details and a safe image reference.' });
+        }
 
         if (isNaN(numPrice) || numPrice < 0) {
             return res.status(400).json({
@@ -117,6 +123,10 @@ async function updateService(req, res) {
 
         const numPrice = Number(price);
         const numDuration = parseInt(duration, 10);
+
+        if (String(name).trim().length > 100 || (description && String(description).length > 5000) || !['active', 'inactive'].includes(status || 'active') || !isSafeImageReference(image)) {
+            return res.status(400).json({ success: false, message: 'Please provide valid service details and a safe image reference.' });
+        }
 
         if (isNaN(numPrice) || numPrice < 0) {
             return res.status(400).json({
@@ -186,4 +196,3 @@ module.exports = {
     updateService,
     deleteService
 };
-

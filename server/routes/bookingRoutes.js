@@ -19,10 +19,7 @@ const router = express.Router();
 const bookingController =
     require('../controllers/bookingController');
 
-const {
-    verifyToken,
-    optionalToken
-} = require('../middleware/authMiddleware');
+const { verifyToken } = require('../middleware/authMiddleware');
 
 const {
     verifyAdmin
@@ -50,6 +47,7 @@ router.get(
  */
 router.get(
     '/ref/:reference',
+    verifyToken,
     bookingController.getBookingByReference
 );
 
@@ -75,7 +73,7 @@ const bookingCreateLimiter = process.env.NODE_ENV === 'production'
 router.post(
     '/',
     bookingCreateLimiter,
-    optionalToken,
+    verifyToken,
     bookingController.createBooking
 );
 

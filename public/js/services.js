@@ -17,23 +17,16 @@
         }[char]));
     }
 
-    function getImagePath(image, id) {
-
-        const fallback =
-            `/assets/images/service-${id}.jpg`;
+    function getImagePath(image) {
 
         if (!image || !String(image).trim()) {
-            return fallback;
+            return '';
         }
 
         let src =
             String(image).trim();
 
-        if (
-            src.startsWith('http://') ||
-            src.startsWith('https://') ||
-            src.startsWith('data:')
-        ) {
+        if (/^https:\/\//i.test(src)) {
             return src;
         }
 
@@ -45,6 +38,8 @@
                 src.substring(7);
         }
 
+        if (!/^(?:\/)?assets\/(?:images|logo)\/[a-z0-9._-]+\.(?:avif|gif|jpe?g|png|webp|svg)$/i.test(src) || src.includes('..')) return '';
+
         if (!src.startsWith('/')) {
             src =
                 '/' + src;
@@ -55,10 +50,8 @@
 
     async function loadServices() {
 
-        const container =
-            document.getElementById(
-                'servicesContainer'
-            );
+        const container = document.getElementById('servicesContainer')
+            || document.getElementById('homeServicesContainer');
 
         if (!container) {
             return;
@@ -89,11 +82,13 @@
                 );
             }
 
-            const services =
-                response.data.filter(service =>
+            const activeServices = response.data.filter(service =>
                     service.status === 'active' ||
                     service.status === 1
                 );
+            const services = container.id === 'homeServicesContainer'
+                ? activeServices.slice(0, 3)
+                : activeServices;
 
             if (!services.length) {
 
@@ -121,11 +116,7 @@
                     const name =
                         escapeHtml(service.name);
 
-                    const description =
-                        escapeHtml(
-                            service.description ||
-                            'Professional grooming service.'
-                        );
+                    const description = escapeHtml(service.description || '');
 
                     const price =
                         Number(
@@ -144,12 +135,7 @@
 
                             <div class="service-image">
 
-                                <img
-                                    src="${escapeHtml(image)}"
-                                    alt="${name}"
-                                    loading="lazy"
-                                    onerror="this.onerror=null;this.src='/assets/images/service-${Number(service.id)}.jpg';"
-                                >
+                                ${image ? `<img src="${escapeHtml(image)}" alt="${name}" loading="lazy" onerror="this.hidden=true">` : ''}
 
                             </div>
 
@@ -167,9 +153,7 @@
 
                                 </div>
 
-                                <p>
-                                    ${description}
-                                </p>
+                                ${description ? `<p>${description}</p>` : ''}
 
                                 <div
                                     style="

@@ -334,8 +334,49 @@ document.addEventListener(
 
         updateNavbarAuth();
 
+        loadApprovedFeedback();
+
     }
 );
+
+async function loadApprovedFeedback() {
+    const container = document.getElementById('approvedFeedbackContainer');
+    if (!container || !window.api) return;
+
+    try {
+        const response = await window.api.get('/feedback');
+        if (!response.success || !Array.isArray(response.data)) throw new Error('Feedback is unavailable.');
+        if (!response.data.length) {
+            container.innerHTML = '<p class="api-state">Verified client reviews will appear here after completed appointments are reviewed.</p>';
+            return;
+        }
+
+        container.replaceChildren(...response.data.map(review => {
+            const card = document.createElement('article');
+            card.className = 'testimonial-card';
+            const stars = document.createElement('div');
+            stars.className = 'testimonial-stars';
+            stars.setAttribute('aria-label', `${Number(review.rating)} out of 5 stars`);
+            stars.textContent = `${'★'.repeat(Math.max(0, Math.min(5, Number(review.rating) || 0)))}${'☆'.repeat(5 - Math.max(0, Math.min(5, Number(review.rating) || 0)))}`;
+            const quote = document.createElement('p');
+            quote.textContent = review.comment || '';
+            const author = document.createElement('div');
+            author.className = 'testimonial-author';
+            const info = document.createElement('div');
+            info.className = 'author-info';
+            const name = document.createElement('h4');
+            name.textContent = review.customer_name || 'Verified client';
+            const service = document.createElement('span');
+            service.textContent = review.service_name || 'Completed appointment';
+            info.append(name, service);
+            author.append(info);
+            card.append(stars, quote, author);
+            return card;
+        }));
+    } catch (_) {
+        container.innerHTML = '<p class="api-state">Verified client reviews will appear here after completed appointments are reviewed.</p>';
+    }
+}
 
 
 

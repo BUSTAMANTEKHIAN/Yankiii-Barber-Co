@@ -186,11 +186,26 @@
             Barber Photo
         </label>
 
+        <!-- Preview Box -->
+        <div style="width: 100%; height: 160px; border-radius: 12px; border: 1.5px dashed var(--border); background: var(--light); display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 12px;">
+            <img id="barberImagePreview" alt="Barber image preview" src="../assets/images/barber-1.jpg" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+
+        <!-- Presets -->
+        <div style="display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; align-items: center;">
+            <span style="font-size: 12px; color: #65705f; font-weight: 600;">Choose Preset:</span>
+            <button type="button" class="btn btn-sm btn-outline" style="padding: 4px 10px; font-size: 11px;" onclick="selectBarberPreset('/assets/images/barber-1.jpg')">Barber 1</button>
+            <button type="button" class="btn btn-sm btn-outline" style="padding: 4px 10px; font-size: 11px;" onclick="selectBarberPreset('/assets/images/barber-2.jpg')">Barber 2</button>
+            <button type="button" class="btn btn-sm btn-outline" style="padding: 4px 10px; font-size: 11px;" onclick="selectBarberPreset('/assets/images/barber-3.jpg')">Barber 3</button>
+            <button type="button" class="btn btn-sm btn-outline" style="padding: 4px 10px; font-size: 11px;" onclick="selectBarberPreset('/assets/logo/logo.png')">Logo Icon</button>
+        </div>
+
         <input
             type="text"
             id="barberImage"
             class="form-control"
-            placeholder="/assets/images/barber-1.jpg"
+            placeholder="/assets/images/barber-1.jpg or https://..."
+            oninput="updateAdminImagePreview('barberImage','barberImagePreview')"
         >
 
         <small
@@ -202,9 +217,7 @@
                 line-height:1.5;
             "
         >
-            Enter the image path.
-            Example:
-            /assets/images/barber-1.jpg
+            Select a preset above or enter a local path / valid HTTPS URL.
         </small>
 
     </div>
@@ -306,4 +319,3 @@
 </body>
 
 </html>
-

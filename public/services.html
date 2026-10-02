@@ -59,84 +59,12 @@
                         <h2>Select Your <span>Treatment</span></h2>
                     </div>
                     <p style="color: #65705f; max-width: 460px;">
-                        All services include hot towel finish, straight razor neck clean-up, and premium styling product application.
+                        Explore the current services, prices, and appointment durations available at the shop.
                     </p>
                 </div>
 
-                <!-- Dynamic / Fallback Services Grid -->
-                <div class="service-grid" id="servicesContainer">
-                    <!-- Service 1 -->
-                    <article class="service-card">
-                        <div class="service-image">
-                            <img src="assets\images\service-1.jpg" alt="Classic Haircut">
-                        </div>
-                        <div class="service-content">
-                            <div class="service-top">
-                                <h3>Classic Haircut</h3>
-                                <span>₱250</span>
-                            </div>
-                            <p>A clean and timeless haircut tailored to your preferred style. Includes consultation, rinse, and precision scissor/clipper finish.</p>
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
-                                <span class="duration"><i class="fa-regular fa-clock"></i> 30 min</span>
-                                <a href="booking.html?service_id=1" class="btn btn-sm btn-outline">Book Service</a>
-                            </div>
-                        </div>
-                    </article>
-
-                    <!-- Service 2 -->
-                    <article class="service-card">
-                        <div class="service-image">
-                            <img src="assets/images/service-2.jpg" alt="Signature Fade">
-                        </div>
-                        <div class="service-content">
-                            <div class="service-top">
-                                <h3>Signature Fade</h3>
-                                <span>₱350</span>
-                            </div>
-                            <p>Skin taper, low, mid, or high fade with seamless transition, foil shaver close finish, and razor edge sharpness.</p>
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
-                                <span class="duration"><i class="fa-regular fa-clock"></i> 45 min</span>
-                                <a href="booking.html?service_id=2" class="btn btn-sm btn-outline">Book Service</a>
-                            </div>
-                        </div>
-                    </article>
-
-                    <!-- Service 3 -->
-                    <article class="service-card">
-                        <div class="service-image">
-                            <img src="assets/images/service-3.jpg" alt="Hair and Beard Combo">
-                        </div>
-                        <div class="service-content">
-                            <div class="service-top">
-                                <h3>Hair & Beard</h3>
-                                <span>₱450</span>
-                            </div>
-                            <p>Complete grooming session including full haircut of choice, beard sculpting, line-up, organic beard oil, and hot towel.</p>
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
-                                <span class="duration"><i class="fa-regular fa-clock"></i> 60 min</span>
-                                <a href="booking.html?service_id=3" class="btn btn-sm btn-outline"onclick="return requireBookingLogin(event)">Book Service</a>
-                            </div>
-                        </div>
-                    </article>
-
-                    <!-- Service 4 -->
-                    <article class="service-card">
-                        <div class="service-image">
-                            <img src="assets\images\service-4.jpg" alt="Full Grooming Experience">
-                        </div>
-                        <div class="service-content">
-                            <div class="service-top">
-                                <h3>Full Grooming VIP</h3>
-                                <span>₱550</span>
-                            </div>
-                            <p>The total executive package: Signature Fade, beard grooming, exfoliating facial cleanse, hot lather shave, scalp massage, and tonic styling.</p>
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
-                                <span class="duration"><i class="fa-regular fa-clock"></i> 75 min</span>
-                                <a href="booking.html?service_id=4" class="btn btn-sm btn-outline" onclick="return requireBookingLogin(event)">Book Service</a>
-                            </div>
-                        </div>
-                    </article>
-                </div>
+                <!-- Services are loaded from the active database catalog. -->
+                <div class="service-grid" id="servicesContainer" aria-live="polite"><p class="api-state">Loading services…</p></div>
             </div>
         </section>
 
@@ -197,11 +125,6 @@
             <img src="assets\logo\logo.png" alt="Yankiii Barber Co.">
         </a>
                 <p>Precision cuts. Personal style. Your standard.</p>
-                <div class="social-links">
-                    <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
-                    <a href="#"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="#"><i class="fa-brands fa-tiktok"></i></a>
-                </div>
             </div>
 
             <div class="footer-column">
@@ -212,18 +135,12 @@
                 <a href="about.html">About</a>
             </div>
 
-            <div class="footer-column">
-                <h4>Services</h4>
-                <a href="services.html">Classic Haircut</a>
-                <a href="services.html">Signature Fade</a>
-                <a href="services.html">Hair & Beard</a>
-                <a href="services.html">Full Grooming VIP</a>
-            </div>
+            <div class="footer-column"><h4>Services</h4><a href="services.html">View Current Services</a></div>
 
             <div class="footer-column">
                 <h4>Visit Us</h4>
-                <p>Your Location<br>Biñan, Laguna</p>
-                <p>Mon – Sun<br>9:00 AM – 8:00 PM</p>
+                <p>Biñan, Laguna</p>
+                <p><span data-business-hours>Business hours loading…</span></p>
             </div>
         </div>
 
@@ -241,6 +158,7 @@
     <script src="js/booking-guard.js"></script>
     
     <script src="/js/cookie-consent.js"></script>
+    <script src="/js/business-hours.js"></script>
 </body>
 
 </html>

@@ -236,9 +236,35 @@
 
             </div>
 
+            <!-- STATUS KPI TABS -->
+            <div class="booking-kpi-tabs" role="tablist" aria-label="Filter bookings by status">
+                <button type="button" class="booking-kpi-tab active" data-status="all" onclick="selectBookingStatusTab('all')" role="tab" aria-selected="true">
+                    <span>All</span>
+                    <span class="kpi-tab-count" id="kpiCountAll">0</span>
+                </button>
+                <button type="button" class="booking-kpi-tab" data-status="pending" onclick="selectBookingStatusTab('pending')" role="tab" aria-selected="false">
+                    <i class="fa-regular fa-clock" style="color:#d97706;"></i>
+                    <span>Pending</span>
+                    <span class="kpi-tab-count" id="kpiCountPending">0</span>
+                </button>
+                <button type="button" class="booking-kpi-tab" data-status="confirmed" onclick="selectBookingStatusTab('confirmed')" role="tab" aria-selected="false">
+                    <i class="fa-regular fa-calendar-check" style="color:#0284c7;"></i>
+                    <span>Confirmed</span>
+                    <span class="kpi-tab-count" id="kpiCountConfirmed">0</span>
+                </button>
+                <button type="button" class="booking-kpi-tab" data-status="completed" onclick="selectBookingStatusTab('completed')" role="tab" aria-selected="false">
+                    <i class="fa-solid fa-circle-check" style="color:#16a34a;"></i>
+                    <span>Completed</span>
+                    <span class="kpi-tab-count" id="kpiCountCompleted">0</span>
+                </button>
+                <button type="button" class="booking-kpi-tab" data-status="cancelled" onclick="selectBookingStatusTab('cancelled')" role="tab" aria-selected="false">
+                    <i class="fa-solid fa-ban" style="color:#dc2626;"></i>
+                    <span>Cancelled</span>
+                    <span class="kpi-tab-count" id="kpiCountCancelled">0</span>
+                </button>
+            </div>
 
             <!-- FILTER CARD -->
-
             <section class="admin-card booking-filter-card" aria-labelledby="bookingFiltersTitle">
                 <div class="admin-card-header booking-filter-header">
                     <div>
@@ -247,8 +273,8 @@
                                 <i class="fa-solid fa-filter"></i>
                             </span>
                             <div>
-                                <h3 id="bookingFiltersTitle">Find an appointment</h3>
-                                <p>Search by booking ID, customer, service, barber, or phone number.</p>
+                                <h3 id="bookingFiltersTitle">Filter Appointments</h3>
+                                <p>Search by reference, customer, phone, barber, or appointment date.</p>
                             </div>
                         </div>
                     </div>
@@ -263,41 +289,80 @@
                     </button>
                 </div>
 
-                <div class="admin-filter-bar booking-filter-grid">
-                    <label class="admin-search-wrap booking-search-field">
-                        <span class="sr-only">Search appointments</span>
-                        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-                        <input
-                            type="search"
-                            id="bookingSearchInput"
-                            class="form-control"
-                            placeholder="Search appointments..."
-                            autocomplete="off"
-                            aria-label="Search appointments"
-                            oninput="filterBookingsTable()"
-                        >
-                    </label>
+                <div class="booking-filter-bar-advanced">
+                    <div class="booking-filter-field">
+                        <label for="bookingSearchInput">Search</label>
+                        <div class="admin-search-wrap">
+                            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                            <input
+                                type="search"
+                                id="bookingSearchInput"
+                                class="form-control"
+                                placeholder="Search by name, ref, phone..."
+                                autocomplete="off"
+                                aria-label="Search appointments"
+                                oninput="filterBookingsTable()"
+                            >
+                        </div>
+                    </div>
 
-                    <label class="booking-status-field">
-                        <span class="booking-field-label">Status</span>
+                    <div class="booking-filter-field">
+                        <label for="bookingBarberFilter">Barber</label>
                         <select
-                            id="bookingStatusFilter"
+                            id="bookingBarberFilter"
                             class="form-control"
                             onchange="filterBookingsTable()"
-                            aria-label="Filter appointments by status"
+                            aria-label="Filter by barber"
                         >
-                            <option value="all">All statuses</option>
-                            <option value="pending">Pending</option>
-                            <option value="confirmed">Confirmed</option>
-                            <option value="completed">Completed</option>
-                            <option value="cancelled">Cancelled</option>
+                            <option value="all">All Barbers</option>
                         </select>
-                    </label>
+                    </div>
+
+                    <div class="booking-filter-field">
+                        <label for="bookingDatePreset">Date Range</label>
+                        <select
+                            id="bookingDatePreset"
+                            class="form-control"
+                            onchange="onBookingDatePresetChange()"
+                            aria-label="Filter by date range"
+                        >
+                            <option value="all">All Dates</option>
+                            <option value="today">Today</option>
+                            <option value="tomorrow">Tomorrow</option>
+                            <option value="this_week">This Week</option>
+                            <option value="custom">Pick Specific Date...</option>
+                        </select>
+                    </div>
+
+                    <div class="booking-filter-field" id="bookingCustomDateWrap" style="display: none;">
+                        <label for="bookingDateInput">Specific Date</label>
+                        <input
+                            type="date"
+                            id="bookingDateInput"
+                            class="form-control"
+                            onchange="filterBookingsTable()"
+                            aria-label="Select custom date"
+                        >
+                    </div>
+
+                    <input type="hidden" id="bookingStatusFilter" value="all">
+
+                    <div class="booking-filter-field" style="align-self: flex-end;">
+                        <button
+                            type="button"
+                            class="btn btn-outline btn-sm"
+                            style="width: 100%; height: 42px; border-radius: var(--radius-sm);"
+                            onclick="clearBookingFilters()"
+                            title="Reset all filters"
+                        >
+                            <i class="fa-solid fa-arrow-rotate-left"></i> Reset
+                        </button>
+                    </div>
                 </div>
 
-                <div class="booking-filter-hint" aria-live="polite">
+                <div class="booking-filter-hint" aria-live="polite" style="margin-top: 14px;">
                     <i class="fa-solid fa-circle-info"></i>
-                    <span>Use the filters above to quickly find a customer's appointment.</span>
+                    <span id="bookingFilterSummary">Showing all appointments.</span>
                 </div>
             </section>
 
@@ -391,7 +456,7 @@
 
                 </div>
 
-            </div>
+            </section>
 
         </main>
 
@@ -418,8 +483,8 @@
                         <i class="fa-solid fa-calendar-check"></i>
                     </span>
                     <div>
-                        <span class="eyebrow">APPOINTMENT</span>
-                        <h3 id="bookingDetailsTitle">Booking Details</h3>
+                        <span class="eyebrow">APPOINTMENT DETAILS</span>
+                        <h3 id="bookingDetailsTitle">Booking Summary</h3>
                     </div>
                 </div>
 
@@ -448,12 +513,42 @@
                     onclick="closeDetailsModal()"
                 >
                     <i class="fa-solid fa-check"></i>
-                    Done
+                    Close
                 </button>
             </div>
 
         </div>
 
+    </div>
+
+    <!-- =====================================================
+         CANCELLATION CONFIRMATION MODAL
+    ====================================================== -->
+    <div
+        class="modal-backdrop"
+        id="cancelBookingConfirmModal"
+        role="dialog"
+        aria-modal="true"
+        aria-hidden="true"
+        style="display: none; align-items: center; justify-content: center;"
+    >
+        <div class="modal-dialog" style="max-width: 440px; padding: 24px; text-align: center; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.25);">
+            <div style="width: 56px; height: 56px; border-radius: 50%; background: #fee2e2; color: #dc2626; display: grid; place-items: center; font-size: 24px; margin: 0 auto 16px;">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 style="font-size: 18px; margin-bottom: 8px; color: var(--dark);">Cancel Appointment?</h3>
+            <p style="font-size: 13px; color: #65705f; margin-bottom: 22px; line-height: 1.5;" id="cancelConfirmText">
+                Are you sure you want to cancel this booking? This will update the status to cancelled.
+            </p>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button type="button" class="btn btn-outline btn-sm" onclick="closeCancelConfirmModal()">
+                    Keep Booking
+                </button>
+                <button type="button" class="btn btn-sm" id="confirmCancelProceedBtn" style="background: #dc2626; color: #fff; border-color: #dc2626;">
+                    <i class="fa-solid fa-xmark"></i> Yes, Cancel
+                </button>
+            </div>
+        </div>
     </div>
 
 
@@ -564,15 +659,23 @@
 
             document.addEventListener('click', function (event) {
                 const modal = document.getElementById('bookingDetailsModal');
-
                 if (modal && event.target === modal) {
                     closeDetailsModal();
+                }
+                const cancelModal = document.getElementById('cancelBookingConfirmModal');
+                if (cancelModal && event.target === cancelModal) {
+                    closeCancelConfirmModal();
                 }
             });
 
             document.addEventListener('keydown', function (event) {
-                if (event.key === 'Escape' && typeof window.closeDetailsModal === 'function') {
-                    closeDetailsModal();
+                if (event.key === 'Escape') {
+                    if (typeof window.closeDetailsModal === 'function') {
+                        closeDetailsModal();
+                    }
+                    if (typeof window.closeCancelConfirmModal === 'function') {
+                        closeCancelConfirmModal();
+                    }
                 }
             });
         })();

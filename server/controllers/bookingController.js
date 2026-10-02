@@ -1668,6 +1668,7 @@ async function getAllBookings(req, res) {
         let query = `
             SELECT
                 b.id,
+                b.user_id,
                 b.booking_reference,
                 b.customer_name,
                 b.customer_email,
@@ -1829,6 +1830,16 @@ async function updateBookingStatus(req, res) {
                     `Status must be one of: ${VALID_BOOKING_STATUSES.join(', ')}`
             });
         }
+
+        const [accountRows] = await pool.query(
+            'SELECT role FROM users WHERE id = ? LIMIT 1',
+            [req.user.id]
+        );
+        if (!accountRows.length) {
+            return res.status(401).json({ success: false, message: 'Your account could not be verified. Please log in again.' });
+        }
+        // Authorization uses the current database role, never a stale JWT claim.
+        req.user.role = accountRows[0].role;
 
         if (
             req.user.role !== 'admin'
@@ -2054,6 +2065,18 @@ async function getBookingByReference(req, res) {
 
         const booking = rows[0];
 
+        const [accountRows] = await pool.query(
+            'SELECT id, role, email FROM users WHERE id = ? LIMIT 1',
+            [req.user.id]
+        );
+        if (!accountRows.length) {
+            return res.status(401).json({ success: false, message: 'Your account could not be verified. Please log in again.' });
+        }
+        const account = accountRows[0];
+        if (account.role !== 'admin' && (Number(booking.user_id) !== Number(account.id) || booking.customer_email.toLowerCase() !== account.email.toLowerCase())) {
+            return res.status(404).json({ success: false, message: 'Appointment not found.' });
+        }
+
         return res.status(200).json({
             success: true,
             data: booking
@@ -2079,4 +2102,3 @@ module.exports = {
     getAllBookings,
     updateBookingStatus
 };
-
