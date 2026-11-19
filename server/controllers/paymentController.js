@@ -21,45 +21,71 @@ function toCents(value) {
 }
 
 async function createCheckoutForBooking(bookingId, userId) {
-    const [rows] = await pool.query(`
-        SELECT b.id, b.user_id, b.booking_reference, b.customer_name, b.customer_email, b.customer_phone,
-               b.service_id, b.total_price, b.status, s.name AS service_name
-        FROM bookings b JOIN services s ON s.id = b.service_id
-        WHERE b.id = ? LIMIT 1`, [bookingId]);
-    const booking = rows[0];
-    if (!booking || Number(booking.user_id) !== Number(userId)) {
-        const error = new Error('Booking not found.'); error.status = 404; throw error;
-    }
-    if (booking.status === 'cancelled') { const error = new Error('Cancelled bookings cannot be paid.'); error.status = 409; throw error; }
-
-    const [payments] = await pool.query(`SELECT id, payment_status, checkout_url, maya_checkout_id, created_at
-        FROM booking_payments WHERE booking_id = ? ORDER BY id DESC LIMIT 1`, [booking.id]);
-    const [paidRows] = await pool.query("SELECT id FROM booking_payments WHERE booking_id = ? AND payment_status IN ('paid','refunded') LIMIT 1", [booking.id]);
-    if (paidRows.length) { const error = new Error('This booking is already paid or has a recorded refund.'); error.status = 409; throw error; }
-    const latestPayment = payments[0];
-    if (latestPayment?.payment_status === 'pending' && latestPayment.checkout_url &&
-        Date.now() - new Date(latestPayment.created_at).getTime() < 65 * 60 * 1000) {
-        return { checkoutUrl: latestPayment.checkout_url, paymentStatus: 'pending' };
-    }
-
-    const requestReferenceNumber = newPaymentReference();
-    const [insert] = await pool.query(`INSERT INTO booking_payments
-        (booking_id, payment_reference, amount, currency, payment_method, payment_status)
-        VALUES (?, ?, ?, 'PHP', 'maya_checkout', 'pending')`, [booking.id, requestReferenceNumber, booking.total_price]);
+    const connection = await pool.getConnection();
+    let booking;
+    let paymentId;
     try {
-        const checkout = await createCheckout({ booking, requestReferenceNumber });
+        await connection.beginTransaction();
+        const [rows] = await connection.query(`
+            SELECT b.id, b.user_id, b.booking_reference, b.customer_name, b.customer_email, b.customer_phone,
+                   b.service_id, b.total_price, b.status, s.name AS service_name
+            FROM bookings b JOIN services s ON s.id = b.service_id
+            WHERE b.id = ? LIMIT 1 FOR UPDATE`, [bookingId]);
+        booking = rows[0];
+        if (!booking || Number(booking.user_id) !== Number(userId)) {
+            const error = new Error('Booking not found.'); error.status = 404; throw error;
+        }
+        if (booking.status === 'cancelled') { const error = new Error('Cancelled bookings cannot be paid.'); error.status = 409; throw error; }
+
+        const [payments] = await connection.query(`SELECT id, payment_status, checkout_url, created_at
+            FROM booking_payments WHERE booking_id = ? ORDER BY id DESC LIMIT 1 FOR UPDATE`, [booking.id]);
+        const [paidRows] = await connection.query("SELECT id FROM booking_payments WHERE booking_id = ? AND payment_status IN ('paid','refunded') LIMIT 1", [booking.id]);
+        if (paidRows.length) { const error = new Error('This booking is already paid or has a recorded refund.'); error.status = 409; throw error; }
+
+        const latestPayment = payments[0];
+        const paymentAge = latestPayment ? Date.now() - new Date(latestPayment.created_at).getTime() : Infinity;
+        if (latestPayment?.payment_status === 'pending' && latestPayment.checkout_url && paymentAge < 65 * 60 * 1000) {
+            await connection.commit();
+            return { checkoutUrl: latestPayment.checkout_url, paymentStatus: 'pending' };
+        }
+        if (latestPayment?.payment_status === 'pending' && !latestPayment.checkout_url && paymentAge < 2 * 60 * 1000) {
+            const error = new Error('Checkout is already being created for this appointment. Please wait a moment and retry.');
+            error.status = 409;
+            throw error;
+        }
+        if (latestPayment?.payment_status === 'pending' && !latestPayment.checkout_url) {
+            await connection.query("UPDATE booking_payments SET payment_status = 'failed' WHERE id = ?", [latestPayment.id]);
+        }
+
+        const requestReferenceNumber = newPaymentReference();
+        const [insert] = await connection.query(`INSERT INTO booking_payments
+            (booking_id, payment_reference, amount, currency, payment_method, payment_status)
+            VALUES (?, ?, ?, 'PHP', 'maya_checkout', 'pending')`, [booking.id, requestReferenceNumber, booking.total_price]);
+        paymentId = insert.insertId;
+        await connection.commit();
+    } catch (error) {
+        try { await connection.rollback(); } catch (_) {}
+        throw error;
+    } finally {
+        connection.release();
+    }
+
+    try {
+        const [paymentRows] = await pool.query('SELECT payment_reference FROM booking_payments WHERE id = ? LIMIT 1', [paymentId]);
+        const checkout = await createCheckout({ booking, requestReferenceNumber: paymentRows[0].payment_reference });
         if (!checkout.checkoutId || !checkout.redirectUrl) throw new Error('Maya did not return a checkout session.');
         await pool.query(`UPDATE booking_payments SET maya_checkout_id = ?, checkout_url = ? WHERE id = ?`,
-            [checkout.checkoutId, checkout.redirectUrl, insert.insertId]);
+            [checkout.checkoutId, checkout.redirectUrl, paymentId]);
         return { checkoutUrl: checkout.redirectUrl, paymentStatus: 'pending' };
     } catch (error) {
-        await pool.query(`UPDATE booking_payments SET payment_status = 'failed' WHERE id = ?`, [insert.insertId]);
+        await pool.query(`UPDATE booking_payments SET payment_status = 'failed' WHERE id = ?`, [paymentId]);
         throw error;
     }
 }
 
 async function createCheckoutRoute(req, res) {
     try {
+        if (!/^\d+$/.test(req.params.id || '')) return res.status(400).json({ success: false, message: 'Invalid booking.' });
         const id = Number.parseInt(req.params.id, 10);
         if (!Number.isInteger(id) || id <= 0) return res.status(400).json({ success: false, message: 'Invalid booking.' });
         const result = await createCheckoutForBooking(id, req.user.id);
